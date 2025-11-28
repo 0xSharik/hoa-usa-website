@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  transition:
+    background-color 250ms ease,
+    color 250ms ease,
+    border-color 250ms ease;
+}
+
+body {
+  background: var(--background);
+  color: var(--text);
+  transition:
+    background-color 250ms ease,
+    color 250ms ease;
+}
+
+* {
+  transition:
+    background-color 250ms ease,
+    color 250ms ease,
+    border-color 250ms ease,
+    box-shadow 250ms ease;
+}
