@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ComplaintManagement from './components/ComplaintManagement';
+import ContactManagement from './components/ContactManagement';
 import AnnouncementManagement from './components/AnnouncementManagement';
 import ResourcesEditor from './components/ResourcesEditor';
-import { Menu, X, Home, BarChart3, Megaphone, BookOpen, MessageSquare, LogOut } from 'lucide-react';
+import { Menu, X, BarChart3, Megaphone, BookOpen, MessageSquare, Mail, LogOut } from 'lucide-react';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -20,7 +21,8 @@ const AdminDashboard = () => {
     { id: 'overview', label: 'Dashboard Overview', icon: BarChart3 },
     { id: 'announcements', label: 'Announcements', icon: Megaphone },
     { id: 'resources', label: 'Resources', icon: BookOpen },
-    { id: 'complaints', label: 'Complaint Management', icon: MessageSquare }
+    { id: 'complaints', label: 'Complaint Management', icon: MessageSquare },
+    { id: 'contacts', label: 'Contact Management', icon: Mail }
   ];
 
   const renderContent = () => {
@@ -33,6 +35,8 @@ const AdminDashboard = () => {
         return <ResourcesEditor />;
       case 'complaints':
         return <ComplaintManagement />;
+      case 'contacts':
+        return <ContactManagement />;
       default:
         return <DashboardOverview />;
     }

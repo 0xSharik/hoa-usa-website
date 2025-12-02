@@ -5,7 +5,6 @@ import logo from '../../assets/logo.png';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState(null);
   const [scrolled, setScrolled] = useState(false);
 
   const location = useLocation();
@@ -27,16 +26,11 @@ const Navbar = () => {
 
   const navItems = [
     { name: "Home" },
-    { name: "About" },
     { name: "Resources" },
-    { name: "Vendor Directory" },
-    { name: "Advertise" },
     { name: "Contact" },
   ];
 
   const toggleMenu = () => setIsMenuOpen((v) => !v);
-  const toggleDropdown = (menu) =>
-    setActiveDropdown(activeDropdown === menu ? null : menu);
 
   const isActive = (path) => location.pathname === path;
   const isActiveSubmenu = (basePath) =>
@@ -44,15 +38,9 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".nav-item")) setActiveDropdown(null);
-    };
-
     window.addEventListener("scroll", handleScroll);
-    document.addEventListener("mousedown", handleClickOutside);
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -70,7 +58,7 @@ const Navbar = () => {
     open: {
       opacity: 1,
       height: "auto",
-      transition: { duration: 0.25 },
+      transition: { duration: 0.15 },
     },
   };
 
@@ -120,23 +108,19 @@ const Navbar = () => {
             {/* DESKTOP NAV */}
             <div className="hidden md:flex items-center space-x-6">
               {navItems.map((item, index) => {
-                const path = item.name === "Vendor Directory" 
-                  ? "/directories/vendors" 
-                  : `/${item.name.toLowerCase().replace(/\s+/g, "-")}`;
+                const path = `/${item.name.toLowerCase().replace(/\s+/g, "-")}`;
 
                 return (
                   <motion.div
                     key={item.name}
-                    className="relative nav-item"
-                    onMouseEnter={() => toggleDropdown(item.name)}
-                    onMouseLeave={() => setActiveDropdown(null)}
+                    className="relative"
                     initial={{ opacity: 0, y: -12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.08 * index }}
                   >
                     <ScrollToTopLink
                       to={path}
-                      className={`relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                      className={`relative px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-150 ${
                         isActive(path) || isActiveSubmenu(path)
                           ? "text-indigo-600 bg-indigo-500/10"
                           : "text-gray-700 hover:text-indigo-600 hover:bg-indigo-500/5"
@@ -144,35 +128,6 @@ const Navbar = () => {
                     >
                       {item.name}
                     </ScrollToTopLink>
-
-                    {/* DROPDOWN */}
-                    <AnimatePresence>
-                      {item.submenu &&
-                        activeDropdown === item.name && (
-                          <motion.div
-                            initial={{ opacity: 0, y: -8, scale: 0.96 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -8, scale: 0.96 }}
-                            transition={{ duration: 0.18 }}
-                            className="absolute left-0 mt-3 w-52 rounded-2xl border backdrop-blur-xl shadow-2xl overflow-hidden"
-                            style={{
-                              background:
-                                "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(245,247,255,0.9))",
-                              borderColor: "rgba(0,0,0,0.08)",
-                            }}
-                          >
-                            {item.submenu.map((sub) => (
-                              <ScrollToTopLink
-                                key={sub.name}
-                                to={sub.path}
-                                className="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-indigo-500/10 transition"
-                              >
-                                {sub.name}
-                              </ScrollToTopLink>
-                            ))}
-                          </motion.div>
-                        )}
-                    </AnimatePresence>
                   </motion.div>
                 );
               })}
@@ -224,16 +179,14 @@ const Navbar = () => {
             >
               <div className="px-4 py-4 space-y-2">
                 {navItems.map((item) => {
-                  const path = item.name === "Vendor Directory" 
-                    ? "/directories/vendors" 
-                    : `/${item.name.toLowerCase().replace(/\s+/g, "-")}`;
+                  const path = `/${item.name.toLowerCase().replace(/\s+/g, "-")}`;
 
                   return (
                     <ScrollToTopLink
                       key={item.name}
                       to={path}
                       onClick={() => setIsMenuOpen(false)}
-                      className="block px-3 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:bg-indigo-500/10 hover:text-indigo-600 transition"
+                      className="block px-3 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:bg-indigo-500/10 hover:text-indigo-600 transition duration-150"
                     >
                       {item.name}
                     </ScrollToTopLink>

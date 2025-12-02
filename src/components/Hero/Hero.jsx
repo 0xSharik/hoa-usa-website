@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useMotionValue, animate } from 'framer-motion';
-import { Award, ArrowRight, ChevronDown, Building2, BookOpen, Users } from 'lucide-react';
+import { Award, ArrowRight, ChevronDown } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { 
   AnimatedSection, 
@@ -140,15 +140,6 @@ const Hero = () => {
             </motion.span>
           </h1>
 
-          <motion.p
-            className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-12 leading-relaxed"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-          >
-            Your comprehensive resource for professional HOA management, expert education, and thriving community excellence.
-          </motion.p>
-
           {/* CTA Buttons */}
           <motion.div
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
@@ -156,77 +147,10 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
           >
-            <motion.button
-              className="group relative px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold text-lg overflow-hidden"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link to="/directories/vendors" className="relative z-10 flex items-center gap-2">
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
-                <span className="relative z-10 flex items-center gap-2">
-                  Explore Vendor Directory
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Link>
-            </motion.button>
+            
 
-            <motion.button
-              className="px-8 py-4 bg-white/5 backdrop-blur-sm text-gray-700 rounded-xl font-semibold text-lg border border-indigo-200 hover:bg-indigo-50 transition-all"
-              whileHover={{ scale: 1.05, borderColor: 'var(--primary)' }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link to="/resources" className="flex items-center gap-2">
-                View Resources
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </motion.button>
+            
           </motion.div>
-        </motion.div>
-
-        {/* Feature Cards */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1 }}
-        >
-          {[
-            { icon: Building2, title: "HOA Management", description: "Professional tools for effective community oversight" },
-            { icon: BookOpen, title: "Educational Content", description: "Expert guides for boards and residents" },
-            { icon: Users, title: "Community Support", description: "Connect with HOA professionals nationwide" }
-          ].map((feature, i) => (
-            <motion.div
-              key={i}
-              className="group relative p-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all cursor-pointer overflow-hidden"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.3 + i * 0.1 }}
-              whileHover={{ y: -5 }}
-            >
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/10"
-                initial={{ opacity: 0 }}
-                whileHover={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              />
-              <div className="relative z-10">
-                <motion.div
-                  className="w-14 h-14 rounded-xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center mb-4 backdrop-blur-sm border border-white/30"
-                  whileHover={{ rotate: 360, scale: 1.1 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <feature.icon className="w-7 h-7 text-white" />
-                </motion.div>
-                <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
-                <p className="text-white/80">{feature.description}</p>
-              </div>
-            </motion.div>
-          ))}
         </motion.div>
       </motion.div>
 
@@ -342,19 +266,7 @@ const DirectoriesSection = () => {
   return (
     <section className="py-24 bg-gray-50 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Comprehensive Directories
-          </h2>
-          <p className="text-xl text-gray-600">
-            Connect with industry-leading professionals and services
-          </p>
-        </motion.div>
+        
 
         <div className="grid md:grid-cols-2 gap-8">
           {[

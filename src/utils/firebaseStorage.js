@@ -1,6 +1,66 @@
 import { ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '../firebase/config';
 
+// Upload any file to Firebase Storage
+export const uploadFile = async (file, folder = 'files', onProgress = null) => {
+  if (!file) return null;
+
+  try {
+    // Create a unique filename
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2);
+    const filename = `${timestamp}_${randomString}_${file.name}`;
+    
+    // Create storage reference
+    const storageRef = ref(storage, `${folder}/${filename}`);
+    
+    // Create metadata
+    const metadata = {
+      contentType: file.type,
+      customMetadata: {
+        'originalName': file.name,
+        'uploadedAt': new Date().toISOString()
+      }
+    };
+
+    // Upload file
+    if (onProgress) {
+      // Use resumable upload for progress tracking
+      const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+      
+      return new Promise((resolve, reject) => {
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            onProgress(progress);
+          },
+          (error) => {
+            console.error('Upload error:', error);
+            reject(error);
+          },
+          async () => {
+            try {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(downloadURL);
+            } catch (error) {
+              reject(error);
+            }
+          }
+        );
+      });
+    } else {
+      // Simple upload without progress tracking
+      const snapshot = await uploadBytes(storageRef, file, metadata);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      
+      return downloadURL;
+    }
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw error;
+  }
+};
+
 // Upload image to Firebase Storage
 export const uploadImage = async (file, folder = 'images', onProgress = null) => {
   if (!file) return null;
@@ -103,6 +163,7 @@ export const deleteImage = async (path) => {
 };
 
 export default {
+  uploadFile,
   uploadImage,
   getOptimizedImageUrl,
   deleteImage

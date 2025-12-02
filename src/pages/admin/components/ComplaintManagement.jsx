@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAllComplaints, updateComplaintStatus, deleteComplaint } from '../../../firebase/services/formService';
-import { sendEmailReply } from '../../../firebase/services/emailService';
+import { sendComplaintReplyToUser } from '../../../utils/emailService';
+import { FileText, Download, Eye } from 'lucide-react';
 
 const ComplaintManagement = () => {
   const [complaints, setComplaints] = useState([]);
@@ -11,6 +12,13 @@ const ComplaintManagement = () => {
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [replyMessage, setReplyMessage] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
+  // Signature viewing state
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
+  const [signatureUrl, setSignatureUrl] = useState('');
+  const [showViewModal, setShowViewModal] = useState(false);
 
   useEffect(() => {
     loadComplaints();
@@ -59,7 +67,7 @@ const ComplaintManagement = () => {
     
     try {
       setSendingEmail(true);
-      await sendEmailReply('complaintReply', selectedComplaint, replyMessage);
+      await sendComplaintReplyToUser(selectedComplaint, replyMessage, selectedComplaint.status);
       
       // Update status to 'replied'
       await updateComplaintStatus(selectedComplaint.id, 'replied');
@@ -86,9 +94,51 @@ const ComplaintManagement = () => {
     setReplyMessage('');
   };
 
-  const filteredComplaints = complaints.filter(complaint => 
-    filterStatus === 'all' || complaint.status === filterStatus
-  );
+  const openViewModal = (complaint) => {
+    setSelectedComplaint(complaint);
+    setShowViewModal(true);
+  };
+
+  const openSignatureModal = (signatureUrl) => {
+    setSignatureUrl(signatureUrl);
+    setShowSignatureModal(true);
+  };
+
+  const filteredAndSortedComplaints = complaints.filter(complaint => {
+    const matchesStatus = filterStatus === 'all' || complaint.status === filterStatus;
+    const matchesSearch = searchTerm === '' || 
+      (complaint.name && complaint.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (complaint.propertyAddress && complaint.propertyAddress.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (complaint.email && complaint.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (complaint.complaintTypes && complaint.complaintTypes.some(type => type.toLowerCase().includes(searchTerm.toLowerCase())));
+    return matchesStatus && matchesSearch;
+  }).sort((a, b) => {
+    let aValue, bValue;
+    
+    switch(sortBy) {
+      case 'name':
+        aValue = a.name ? a.name.toLowerCase() : '';
+        bValue = b.name ? b.name.toLowerCase() : '';
+        break;
+      case 'date':
+        aValue = a.createdAt ? a.createdAt.toDate() : new Date(0);
+        bValue = b.createdAt ? b.createdAt.toDate() : new Date(0);
+        break;
+      case 'status':
+        aValue = a.status || 'pending';
+        bValue = b.status || 'pending';
+        break;
+      default:
+        aValue = a.createdAt ? a.createdAt.toDate() : new Date(0);
+        bValue = b.createdAt ? b.createdAt.toDate() : new Date(0);
+    }
+    
+    if (sortOrder === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -107,251 +157,185 @@ const ComplaintManagement = () => {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h2 className="text-3xl font-bold text-gray-900 mb-8">Complaint Management</h2>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Complaint Management</h1>
       
       {error && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200 mb-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Status</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            >
-              <option value="all">All Complaints</option>
-              <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
-              <option value="resolved">Resolved</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </div>
-          <div className="text-sm text-gray-600">
-            {filteredComplaints.length} complaint{filteredComplaints.length !== 1 ? 's' : ''} found
-          </div>
+      <div className="mb-6 flex flex-col lg:flex-row gap-4">
+        <div className="flex-1">
+          <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+            Search:
+          </label>
+          <input
+            type="text"
+            id="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by name, address, email, or complaint type..."
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          />
+        </div>
+        
+        <div className="w-full lg:w-auto">
+          <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-1">
+            Filter by Status:
+          </label>
+          <select
+            id="status-filter"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          >
+            <option value="all">All Complaints</option>
+            <option value="pending">Pending</option>
+            <option value="in-progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="rejected">Rejected</option>
+            <option value="replied">Replied</option>
+          </select>
+        </div>
+        
+        <div className="w-full lg:w-auto">
+          <label htmlFor="sort-by" className="block text-sm font-medium text-gray-700 mb-1">
+            Sort by:
+          </label>
+          <select
+            id="sort-by"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          >
+            <option value="date">Date</option>
+            <option value="name">Name</option>
+            <option value="status">Status</option>
+          </select>
+        </div>
+        
+        <div className="w-full lg:w-auto">
+          <label htmlFor="sort-order" className="block text-sm font-medium text-gray-700 mb-1">
+            Order:
+          </label>
+          <select
+            id="sort-order"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+          >
+            <option value="desc">Newest First</option>
+            <option value="asc">Oldest First</option>
+          </select>
         </div>
       </div>
 
-      {/* Complaints List */}
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading complaints...</p>
-          </div>
-        ) : filteredComplaints.length === 0 ? (
-          <div className="p-8 text-center">
-            <div className="text-6xl mb-4">📝</div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No complaints found</h3>
-            <p className="text-gray-600">No complaints match the current filter criteria.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Property Address
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Complaint Types
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredAndSortedComplaints.length === 0 ? (
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Complaint Details</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact Info</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <td colSpan="6" className="px-6 py-4 text-center text-sm text-gray-500">
+                    No complaints found.
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredComplaints.map((complaint) => (
+              ) : (
+                filteredAndSortedComplaints.map((complaint) => (
                   <tr key={complaint.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-                            #{complaint.id || 'N/A'}
-                          </span>
-                          <div className="text-sm font-medium text-gray-900">{complaint.propertyAddress || 'No address'}</div>
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {Array.isArray(complaint.complaintTypes) ? complaint.complaintTypes.join(', ') : complaint.complaintType || 'No type'}
-                        </div>
-                        <div className="text-xs text-gray-400 mt-1">
-                          Date: {complaint.dateSubmitted || formatDate(complaint.createdAt)}
-                        </div>
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {complaint.name}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">{complaint.name}</div>
-                      <div className="text-sm text-gray-500">{complaint.email}</div>
-                      {complaint.phone && <div className="text-sm text-gray-500">{complaint.phone}</div>}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {complaint.propertyAddress}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(complaint.status)}`}>
-                        {complaint.status}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {complaint.complaintTypes ? complaint.complaintTypes.join(', ') : 'No types specified'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(complaint.createdAt)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(complaint.status || 'pending')}`}>
+                        {complaint.status || 'pending'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => setSelectedComplaint(complaint)}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          View
-                        </button>
-                        <select
-                          value={complaint.status}
-                          onChange={(e) => handleStatusUpdate(complaint.id, e.target.value)}
-                          className="text-xs border border-gray-300 rounded px-2 py-1"
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="in-progress">In Progress</option>
-                          <option value="resolved">Resolved</option>
-                          <option value="rejected">Rejected</option>
-                        </select>
-                        <button
-                          onClick={() => handleDelete(complaint.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Delete
-                        </button>
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={() => openViewModal(complaint)}
+                        className="text-green-600 hover:text-green-900 mr-2"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => openReplyModal(complaint)}
+                        className="text-blue-600 hover:text-blue-900 mr-2"
+                      >
+                        Reply
+                      </button>
+                      <button
+                        onClick={() => handleDelete(complaint.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Complaint Detail Modal */}
-      {selectedComplaint && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-xl bg-white">
+      {/* Reply Modal */}
+      {showReplyModal && selectedComplaint && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 relative z-[61]">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900">Complaint Details</h3>
+              <h2 className="text-xl font-bold">Reply to {selectedComplaint.name}</h2>
               <button
-                onClick={() => setSelectedComplaint(null)}
-                className="text-gray-400 hover:text-gray-600"
+                onClick={() => setShowReplyModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-semibold text-gray-900">Complaint Types</h4>
-                <p className="text-gray-700">
-                  {Array.isArray(selectedComplaint.complaintTypes) ? selectedComplaint.complaintTypes.join(', ') : selectedComplaint.complaintType || 'No type specified'}
-                </p>
-                {selectedComplaint.otherComplaintType && (
-                  <p className="text-gray-600 text-sm mt-1">Other: {selectedComplaint.otherComplaintType}</p>
-                )}
-              </div>
-              
-              <div>
-                <h4 className="font-semibold text-gray-900">Description</h4>
-                <p className="text-gray-700 whitespace-pre-wrap">{selectedComplaint.description}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold text-gray-900">Desired Resolution</h4>
-                <p className="text-gray-700 whitespace-pre-wrap">{selectedComplaint.desiredResolution || 'Not specified'}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold text-gray-900">Resolution Attempted</h4>
-                <p className="text-gray-700">{selectedComplaint.resolutionAttempted || 'Not specified'}</p>
-                {selectedComplaint.resolutionDescription && (
-                  <div className="mt-2">
-                    <h5 className="font-medium text-gray-800 text-sm">Resolution Efforts:</h5>
-                    <p className="text-gray-600 text-sm">{selectedComplaint.resolutionDescription}</p>
-                  </div>
-                )}
-              </div>
-              
-              {selectedComplaint.evidenceFiles && (
-                <div>
-                  <h4 className="font-semibold text-gray-900">Evidence Files</h4>
-                  <p className="text-gray-700">Files attached</p>
-                </div>
-              )}
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-semibold text-gray-900">Complaint ID</h4>
-                  <p className="text-gray-700 font-mono text-sm bg-gray-100 px-2 py-1 rounded inline-block">
-                    #{selectedComplaint.id || 'N/A'}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Date Submitted</h4>
-                  <p className="text-gray-700">{selectedComplaint.dateSubmitted || formatDate(selectedComplaint.createdAt)}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Contact Name</h4>
-                  <p className="text-gray-700">{selectedComplaint.name}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Email</h4>
-                  <p className="text-gray-700">{selectedComplaint.email}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Phone</h4>
-                  <p className="text-gray-700">{selectedComplaint.phone || 'Not provided'}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Property Address</h4>
-                  <p className="text-gray-700">{selectedComplaint.propertyAddress || 'Not provided'}</p>
-                </div>
-                {selectedComplaint.mailingAddress && selectedComplaint.mailingAddress !== selectedComplaint.propertyAddress && (
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Mailing Address</h4>
-                    <p className="text-gray-700">{selectedComplaint.mailingAddress}</p>
-                  </div>
-                )}
-                <div>
-                  <h4 className="font-semibold text-gray-900">Signature</h4>
-                  <p className="text-gray-700">{selectedComplaint.signature || 'Not provided'}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Signature Date</h4>
-                  <p className="text-gray-700">{selectedComplaint.signatureDate || selectedComplaint.dateSubmitted || 'Not provided'}</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-semibold text-gray-900">Status</h4>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(selectedComplaint.status)}`}>
-                    {selectedComplaint.status}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="mt-6 flex gap-3">
-                <button
-                  onClick={() => openReplyModal(selectedComplaint)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Send Email Reply
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Reply Modal */}
-      {showReplyModal && selectedComplaint && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold mb-4">Send Email Reply</h3>
             
             <div className="mb-4 p-4 bg-gray-50 rounded-lg">
               <h4 className="font-semibold mb-3">Replying to Complaint:</h4>
@@ -401,33 +385,264 @@ const ComplaintManagement = () => {
             </div>
             
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Custom Message (Optional)
+              <label htmlFor="reply-message" className="block text-sm font-medium text-gray-700 mb-1">
+                Your Reply:
               </label>
               <textarea
+                id="reply-message"
+                rows="6"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={replyMessage}
                 onChange={(e) => setReplyMessage(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                rows={6}
-                placeholder="Add your custom message here..."
-              />
+                placeholder="Type your reply here..."
+              ></textarea>
             </div>
-            
-            <div className="flex justify-end gap-3">
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-red-600 text-sm">{error}</p>
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-3">
               <button
+                type="button"
                 onClick={() => setShowReplyModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 disabled={sendingEmail}
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSendReply}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                disabled={sendingEmail}
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                disabled={sendingEmail || !replyMessage.trim()}
               >
                 {sendingEmail ? 'Sending...' : 'Send Reply'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Modal */}
+      {showViewModal && selectedComplaint && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-4">
+              <h2 className="text-xl font-bold">Complaint Details</h2>
+              <button
+                onClick={() => setShowViewModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h3 className="font-semibold text-gray-700 mb-2">Personal Information</h3>
+                <div className="space-y-2">
+                  <p><span className="font-medium">Name:</span> {selectedComplaint.name}</p>
+                  <p><span className="font-medium">Email:</span> {selectedComplaint.email}</p>
+                  <p><span className="font-medium">Phone:</span> {selectedComplaint.phone}</p>
+                  <p><span className="font-medium">Property Address:</span> {selectedComplaint.propertyAddress}</p>
+                  <p><span className="font-medium">Mailing Address:</span> {selectedComplaint.mailingAddress}</p>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold text-gray-700 mb-2">Complaint Information</h3>
+                <div className="space-y-2">
+                  <p><span className="font-medium">Date Submitted:</span> {formatDate(selectedComplaint.createdAt)}</p>
+                  <p><span className="font-medium">Complaint Types:</span></p>
+                  {selectedComplaint.complaintTypes ? (
+                    <ul className="list-disc list-inside ml-4">
+                      {selectedComplaint.complaintTypes.map((type, index) => (
+                        <li key={index}>{type}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="ml-4">No types specified</p>
+                  )}
+                  {selectedComplaint.otherComplaintType && (
+                    <p><span className="font-medium">Other Type:</span> {selectedComplaint.otherComplaintType}</p>
+                  )}
+                  <p><span className="font-medium">Status:</span> 
+                    <span className={`ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(selectedComplaint.status || 'pending')}`}>
+                      {selectedComplaint.status || 'pending'}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-4">
+              <h3 className="font-semibold text-gray-700 mb-2">Description</h3>
+              <p className="text-gray-600 bg-gray-50 p-3 rounded">{selectedComplaint.description}</p>
+            </div>
+            
+            {selectedComplaint.desiredResolution && (
+              <div className="mt-4">
+                <h3 className="font-semibold text-gray-700 mb-2">Desired Resolution</h3>
+                <p className="text-gray-600 bg-gray-50 p-3 rounded">{selectedComplaint.desiredResolution}</p>
+              </div>
+            )}
+            
+            {(selectedComplaint.resolutionAttempted || selectedComplaint.resolutionDescription) && (
+              <div className="mt-4">
+                <h3 className="font-semibold text-gray-700 mb-2">Resolution Attempt</h3>
+                <p className="text-gray-600 bg-gray-50 p-3 rounded">
+                  {selectedComplaint.resolutionAttempted}: {selectedComplaint.resolutionDescription}
+                </p>
+              </div>
+            )}
+            
+            {/* Evidence Files Section - Always Show */}
+            <div className="mt-4">
+              <h3 className="font-semibold text-gray-700 mb-2">Evidence Files</h3>
+              {selectedComplaint.evidenceFileUrls && selectedComplaint.evidenceFileUrls.length > 0 ? (
+                <div className="space-y-2">
+                  {selectedComplaint.evidenceFileUrls.map((url, index) => (
+                    <div key={index} className="flex items-center space-x-2 bg-gray-50 p-3 rounded">
+                      <FileText className="w-5 h-5 text-blue-600" />
+                      <a 
+                        href={url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline flex-1"
+                      >
+                        {url.split('/').pop() || `Evidence File ${index + 1}`}
+                      </a>
+                      <button
+                        onClick={() => window.open(url, '_blank')}
+                        className="text-gray-600 hover:text-gray-800"
+                        title="View in new tab"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <a 
+                        href={url} 
+                        download
+                        className="text-gray-600 hover:text-gray-800"
+                        title="Download"
+                      >
+                        <Download className="w-4 h-4" />
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-gray-500 text-sm bg-gray-50 p-3 rounded">
+                  <p>No evidence files uploaded.</p>
+                  <div className="mt-2 text-xs text-gray-400">
+                    <p>Debug information:</p>
+                    <p>evidenceFileUrls: {JSON.stringify(selectedComplaint.evidenceFileUrls || 'null')}</p>
+                    <p>evidenceFiles: {JSON.stringify(selectedComplaint.evidenceFiles || 'null')}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {selectedComplaint.signatureImageUrl && (
+              <div className="mt-4">
+                <h3 className="font-semibold text-gray-700 mb-2">Signature</h3>
+                <div className="bg-gray-50 p-3 rounded">
+                  <div className="flex items-start gap-4">
+                    <img 
+                      src={selectedComplaint.signatureImageUrl} 
+                      alt="Signature" 
+                      className="h-20 border border-gray-300 rounded cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => openSignatureModal(selectedComplaint.signatureImageUrl)}
+                      title="Click to view full size"
+                    />
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-500 mb-2">Signed on: {selectedComplaint.signatureDate || 'N/A'}</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => openSignatureModal(selectedComplaint.signatureImageUrl)}
+                          className="inline-flex items-center gap-1 px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                        >
+                          <Eye className="w-3 h-3" />
+                          View
+                        </button>
+                        <a 
+                          href={selectedComplaint.signatureImageUrl}
+                          download={`signature_${selectedComplaint.name}_${selectedComplaint.signatureDate}`}
+                          className="inline-flex items-center gap-1 px-3 py-1 text-xs bg-gray-600 hover:bg-gray-700 text-white rounded transition-colors"
+                        >
+                          <Download className="w-3 h-3" />
+                          Download
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => openReplyModal(selectedComplaint)}
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Reply to Complaint
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowViewModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Signature View Modal */}
+      {showSignatureModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[70]">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6 relative z-[71]">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Signature View</h2>
+              <button
+                onClick={() => setShowSignatureModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="flex justify-center mb-4">
+              <img 
+                src={signatureUrl} 
+                alt="Signature Full View" 
+                className="max-w-full max-h-96 border border-gray-300 rounded shadow-lg"
+              />
+            </div>
+            
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => setShowSignatureModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Close
+              </button>
+              <a 
+                href={signatureUrl}
+                download={`signature_${new Date().getTime()}`}
+                className="inline-flex items-center gap-2 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <Download className="w-4 h-4" />
+                Download Signature
+              </a>
             </div>
           </div>
         </div>

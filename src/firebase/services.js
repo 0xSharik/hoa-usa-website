@@ -16,8 +16,7 @@ import { db } from './config';
 // Collections
 const COLLECTIONS = {
   articles: 'articles',
-  videos: 'videos',
-  newsletters: 'newsletters'
+  videos: 'videos'
 };
 
 // Generic CRUD operations
@@ -104,28 +103,24 @@ export class FirebaseService {
 // Service instances
 export const articlesService = new FirebaseService(COLLECTIONS.articles);
 export const videosService = new FirebaseService(COLLECTIONS.videos);
-export const newslettersService = new FirebaseService(COLLECTIONS.newsletters);
 
 // Resource-specific functions
 export const getResources = async () => {
   try {
-    const [articles, videos, newsletters] = await Promise.all([
+    const [articles, videos] = await Promise.all([
       articlesService.getAll(),
-      videosService.getAll(),
-      newslettersService.getAll()
+      videosService.getAll()
     ]);
 
     return {
       articles: articles.map(article => ({ ...article, type: 'article' })),
-      videos: videos.map(video => ({ ...video, type: 'video', excerpt: video.description })),
-      newsletters: newsletters.map(newsletter => ({ ...newsletter, type: 'newsletter' }))
+      videos: videos.map(video => ({ ...video, type: 'video', excerpt: video.description }))
     };
   } catch (error) {
     console.error('Error getting resources:', error);
     return {
       articles: [],
-      videos: [],
-      newsletters: []
+      videos: []
     };
   }
 };
@@ -138,9 +133,6 @@ export const createResource = async (type, data) => {
     case 'videos':
     case 'video':
       return await videosService.create(data);
-    case 'newsletters':
-    case 'newsletter':
-      return await newslettersService.create(data);
     default:
       throw new Error('Invalid resource type');
   }
@@ -155,9 +147,6 @@ export const updateResource = async (type, id, data) => {
       case 'videos':
       case 'video':
         return await videosService.update(id, data);
-      case 'newsletters':
-      case 'newsletter':
-        return await newslettersService.update(id, data);
       default:
         throw new Error('Invalid resource type');
     }
@@ -176,9 +165,6 @@ export const deleteResource = async (type, id) => {
       case 'videos':
       case 'video':
         return await videosService.delete(id);
-      case 'newsletters':
-      case 'newsletter':
-        return await newslettersService.delete(id);
       default:
         throw new Error('Invalid resource type');
     }

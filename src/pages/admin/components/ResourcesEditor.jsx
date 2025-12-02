@@ -16,8 +16,7 @@ const ResourcesEditor = () => {
   const [error, setError] = useState(null);
   const [resources, setResources] = useState({
     articles: [],
-    videos: [],
-    newsletters: []
+    videos: []
   });
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -34,8 +33,7 @@ const ResourcesEditor = () => {
   // Combine all resources for display
   const allDocuments = [
     ...resources.articles,
-    ...resources.videos,
-    ...resources.newsletters
+    ...resources.videos
   ].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
   // Load data from Firebase on component mount

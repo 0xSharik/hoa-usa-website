@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { submitComplaint } from '../../firebase/services/formService';
-import { AlertTriangle, User, Mail, Phone, Building, MessageSquare, Clock, CheckCircle } from 'lucide-react';
+import { sendComplaintNotificationToAdmin } from '../../utils/emailService';
+import { uploadFile } from '../../utils/firebaseStorage';
+import { AlertTriangle, User, Mail, Phone, Building, MessageSquare, Clock, CheckCircle, Upload, FileText } from 'lucide-react';
 
 const initialFormData = {
   dateSubmitted: new Date().toISOString().split('T')[0],
@@ -14,10 +16,12 @@ const initialFormData = {
   otherComplaintType: '',
   description: '',
   evidenceFiles: null,
+  evidenceFileUrls: [],
   resolutionAttempted: '',
   resolutionDescription: '',
   desiredResolution: '',
-  signature: '',
+  signatureImage: null,
+  signatureImageUrl: '',
   signatureDate: new Date().toISOString().split('T')[0]
 };
 
@@ -60,10 +64,17 @@ const ComplaintForm = () => {
         }));
       }
     } else if (type === 'file') {
-      setFormData(prev => ({
-        ...prev,
-        [name]: files[0]
-      }));
+      if (name === 'evidenceFiles') {
+        setFormData(prev => ({
+          ...prev,
+          evidenceFiles: files[0]
+        }));
+      } else if (name === 'signatureImage') {
+        setFormData(prev => ({
+          ...prev,
+          signatureImage: files[0]
+        }));
+      }
     } else {
       setFormData(prev => ({
         ...prev,
@@ -78,8 +89,50 @@ const ComplaintForm = () => {
 
     try {
       const sanitizedFormData = { ...formData };
+      
+      // Upload evidence files if any
+      if (formData.evidenceFiles) {
+        console.log('Uploading evidence file:', formData.evidenceFiles.name);
+        try {
+          const evidenceUrl = await uploadFile(formData.evidenceFiles, 'complaints/evidence');
+          console.log('Evidence file uploaded successfully:', evidenceUrl);
+          sanitizedFormData.evidenceFileUrls = [evidenceUrl];
+        } catch (uploadError) {
+          console.error('Error uploading evidence file:', uploadError);
+          throw new Error('Failed to upload evidence file');
+        }
+      } else {
+        console.log('No evidence files to upload');
+      }
       delete sanitizedFormData.evidenceFiles;
-      await submitComplaint(sanitizedFormData);
+      
+      // Upload signature image if any
+      if (formData.signatureImage) {
+        console.log('Uploading signature image:', formData.signatureImage.name);
+        try {
+          const signatureUrl = await uploadFile(formData.signatureImage, 'complaints/signatures');
+          console.log('Signature uploaded successfully:', signatureUrl);
+          sanitizedFormData.signatureImageUrl = signatureUrl;
+        } catch (uploadError) {
+          console.error('Error uploading signature image:', uploadError);
+          throw new Error('Failed to upload signature');
+        }
+      } else {
+        console.log('No signature image to upload');
+      }
+      delete sanitizedFormData.signatureImage;
+      
+      // Submit complaint to Firebase
+      const result = await submitComplaint(sanitizedFormData);
+      
+      // Send email notification to admin
+      try {
+        await sendComplaintNotificationToAdmin({ ...sanitizedFormData, id: result.id });
+      } catch (emailError) {
+        console.error('Error sending admin notification:', emailError);
+        // Don't fail the submission if email fails
+      }
+      
       setSubmitted(true);
       
       // Reset form after 3 seconds
@@ -432,17 +485,35 @@ const ComplaintForm = () => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-gray-700 text-sm font-medium mb-2">
-                      Signature: 
+                      Signature Image: 
                     </label>
-                    <input
-                      type="text"
-                      name="signature"
-                      value={formData.signature}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-3 py-2 border-b-2 border-gray-300 focus:border-indigo-500 outline-none bg-transparent"
-                      placeholder="Type your full name as signature"
-                    />
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-indigo-500 transition-colors">
+                      <input
+                        type="file"
+                        name="signatureImage"
+                        onChange={handleChange}
+                        accept="image/*"
+                        required
+                        className="hidden"
+                        id="signature-upload"
+                      />
+                      <label htmlFor="signature-upload" className="cursor-pointer flex flex-col items-center">
+                        <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                        <span className="text-sm text-gray-600">
+                          {formData.signatureImage ? formData.signatureImage.name : 'Click to upload signature image'}
+                        </span>
+                        <span className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 5MB</span>
+                      </label>
+                    </div>
+                    {formData.signatureImage && (
+                      <div className="mt-2">
+                        <img 
+                          src={URL.createObjectURL(formData.signatureImage)} 
+                          alt="Signature preview" 
+                          className="h-16 border border-gray-300 rounded"
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   <div>

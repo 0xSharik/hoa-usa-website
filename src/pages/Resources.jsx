@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link, useParams, useNavigate, Outlet } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileText, 
@@ -150,8 +150,7 @@ const Resources = () => {
   const handleViewDocument = (document) => {
     const allDocuments = [
       ...(resourcesData.articles || []),
-      ...(resourcesData.videos || []),
-      ...(resourcesData.newsletters || [])
+      ...(resourcesData.videos || [])
     ];
     
     const index = allDocuments.findIndex(doc => doc.id === document.id);
@@ -181,8 +180,7 @@ const Resources = () => {
       // Combine all resource types
       items = [
         ...(resourcesData.articles || []),
-        ...(resourcesData.videos || []),
-        ...(resourcesData.newsletters || [])
+        ...(resourcesData.videos || [])
       ];
     } else {
       // Filter by specific category
@@ -370,8 +368,7 @@ const Resources = () => {
         document={selectedDocument}
         documents={[
           ...(resourcesData.articles || []),
-          ...(resourcesData.videos || []),
-          ...(resourcesData.newsletters || [])
+          ...(resourcesData.videos || [])
         ]}
         currentIndex={currentDocumentIndex}
       />
