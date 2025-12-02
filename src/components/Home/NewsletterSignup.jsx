@@ -59,19 +59,19 @@ const NewsletterSignup = () => {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 bg-surface text-text placeholder-textMuted"
               />
             </div>
             
             <div>
-              <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">SELECT STATE*</label>
+              <label htmlFor="state" className="block text-gray-700 text-sm font-bold mb-2">SELECT STATE*</label>
               <select
                 id="state"
                 name="state"
                 required
                 value={formData.state}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
+                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 bg-surface text-text"
               >
                 <option value="">Select State</option>
                 {states.map((state) => (
@@ -81,7 +81,7 @@ const NewsletterSignup = () => {
             </div>
             
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">EMAIL ADDRESS*</label>
+              <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">EMAIL ADDRESS*</label>
               <input
                 type="email"
                 id="email"
@@ -89,12 +89,12 @@ const NewsletterSignup = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 bg-surface text-text placeholder-textMuted"
               />
             </div>
             
             <div>
-              <label htmlFor="captcha" className="block text-sm font-medium text-gray-700 mb-1">CAPTCHA*</label>
+              <label htmlFor="captcha" className="block text-gray-700 text-sm font-bold mb-2">CAPTCHA*</label>
               <input
                 type="text"
                 id="captcha"
@@ -102,8 +102,8 @@ const NewsletterSignup = () => {
                 required
                 value={formData.captcha}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
-                placeholder="Enter the code shown"
+                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 bg-surface text-text placeholder-textMuted"
+                placeholder={`Enter: ${captchaQuestion.answer}`}
               />
             </div>
             

@@ -87,9 +87,9 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto p-6 bg-surface rounded-lg shadow-lg border border-gray-200">
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-gray-900">Vendor Information</h2>
+        <h2 className="text-2xl font-bold text-text">Vendor Information</h2>
         
         {/* Logo Upload */}
         <div className="flex items-center space-x-6">
@@ -101,8 +101,8 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
                 alt="Vendor logo preview"
               />
             ) : (
-              <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-500">Logo</span>
+              <div className="h-24 w-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <span className="text-gray-500 dark:text-gray-400">Logo</span>
               </div>
             )}
           </div>
@@ -112,7 +112,7 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
               type="file" 
               accept="image/*"
               onChange={handleLogoChange}
-              className="block w-full text-sm text-gray-500
+              className="block w-full text-sm text-textMuted
                 file:mr-4 file:py-2 file:px-4
                 file:rounded-full file:border-0
                 file:text-sm file:font-semibold
@@ -125,7 +125,7 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
         {/* Basic Information */}
         <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
           <div className="sm:col-span-6">
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="block text-sm font-medium text-text">
               Vendor Name *
             </label>
             <input
@@ -135,12 +135,12 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
               value={formData.name}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-surface text-text placeholder-textMuted"
             />
           </div>
 
           <div className="sm:col-span-6">
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="description" className="block text-sm font-medium text-text">
               Description
             </label>
             <textarea
@@ -149,12 +149,12 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
               rows={3}
               value={formData.description}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-surface text-text placeholder-textMuted"
             />
           </div>
 
           <div className="sm:col-span-3">
-            <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="state" className="block text-sm font-medium text-text">
               State *
             </label>
             <select
@@ -163,7 +163,7 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
               value={formData.state}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm bg-surface text-text"
             >
               <option value="">Select a state</option>
               <option value="CA">California</option>
@@ -174,7 +174,7 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
           </div>
 
           <div className="sm:col-span-3">
-            <label htmlFor="specialty" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="specialty" className="block text-sm font-medium text-text">
               Specialty *
             </label>
             <input
@@ -184,16 +184,16 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
               value={formData.specialty}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-surface text-text placeholder-textMuted"
             />
           </div>
 
           <div className="sm:col-span-6">
-            <label htmlFor="website" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="website" className="block text-sm font-medium text-text">
               Website
             </label>
             <div className="mt-1 flex rounded-md shadow-sm">
-              <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500 sm:text-sm">
+              <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 dark:bg-gray-700 px-3 text-textMuted sm:text-sm">
                 https://
               </span>
               <input
@@ -202,14 +202,14 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
                 id="website"
                 value={formData.website}
                 onChange={handleChange}
-                className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-surface text-text placeholder-textMuted"
                 placeholder="www.example.com"
               />
             </div>
           </div>
 
           <div className="sm:col-span-3">
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="phone" className="block text-sm font-medium text-text">
               Phone
             </label>
             <input
@@ -218,12 +218,12 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
               id="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-surface text-text placeholder-textMuted"
             />
           </div>
 
           <div className="sm:col-span-3">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium text-text">
               Email *
             </label>
             <input
@@ -233,12 +233,12 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-surface text-text placeholder-textMuted"
             />
           </div>
 
           <div className="sm:col-span-6">
-            <label htmlFor="serviceArea" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="serviceArea" className="block text-sm font-medium text-text">
               Service Area *
             </label>
             <input
@@ -248,7 +248,7 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
               value={formData.serviceArea}
               onChange={handleChange}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-surface text-text placeholder-textMuted"
               placeholder="e.g., Northern California, Nationwide, etc."
             />
           </div>
@@ -266,7 +266,7 @@ const VendorForm = ({ onSave, onCancel, vendor = null }) => {
               onCancel();
             }
           }}
-          className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="rounded-md border border-gray-300 bg-surface py-2 px-4 text-sm font-medium text-text shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           Cancel
         </button>

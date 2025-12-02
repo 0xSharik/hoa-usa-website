@@ -190,21 +190,21 @@ const StateLaws = () => {
       </div>
 
       {/* Search and Filter Section */}
-      <div className="bg-white shadow-md">
+      <div className="bg-surface shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <input
                 type="text"
                 placeholder="Search laws and regulations..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text placeholder-textMuted"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <div>
               <select
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text"
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
               >
@@ -218,7 +218,7 @@ const StateLaws = () => {
             </div>
             <div>
               <select
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
               >
@@ -239,7 +239,7 @@ const StateLaws = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
+            <div className="bg-surface rounded-lg shadow-md p-6 sticky top-24">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Links</h2>
               <ul className="space-y-3">
                 <li>
@@ -291,7 +291,7 @@ const StateLaws = () => {
           
           {/* Main Content */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-surface rounded-lg shadow-md overflow-hidden">
               <div className="p-6 border-b border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-900">
                   {selectedState ? `${selectedState} HOA Laws` : 'HOA Laws by State'}
@@ -384,10 +384,10 @@ const StateLaws = () => {
                 <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
                   <nav className="flex items-center justify-between">
                     <div className="flex-1 flex justify-between">
-                      <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                      <button className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-surface hover:bg-gray-50">
                         Previous
                       </button>
-                      <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                      <button className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-surface hover:bg-gray-50">
                         Next
                       </button>
                     </div>

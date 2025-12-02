@@ -8,8 +8,8 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--text);
+  background: linear-gradient(to bottom right, rgb(239 246 255), white, rgb(243 232 255));
+  color: var(--text, #111827);
   transition:
     background-color 250ms ease,
     color 250ms ease;
@@ -21,4 +21,14 @@ body {
     color 250ms ease,
     border-color 250ms ease,
     box-shadow 250ms ease;
+}
+
+/* Ensure input text colors inherit properly */
+input, textarea, select {
+  color: var(--text, #111827);
+  background-color: var(--surface, #FFFFFF);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--textMuted, #6B7280);
 }

@@ -153,7 +153,7 @@ const Videos = () => {
             const videoId = getYoutubeId(video.link);
             
             return (
-              <div key={video.id || video.link} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <div key={video.id || video.link} className="bg-surface rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                 {embedUrl ? (
                   <div className="relative pt-[56.25%] h-0 overflow-hidden">
                     <img 
@@ -167,7 +167,7 @@ const Videos = () => {
                       rel="noopener noreferrer"
                       className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 hover:bg-opacity-30 transition-all duration-200"
                     >
-                      <div className="w-16 h-16 bg-white bg-opacity-80 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all duration-200">
+                      <div className="w-16 h-16 bg-surface bg-opacity-80 rounded-full flex items-center justify-center hover:bg-opacity-100 transition-all duration-200">
                         <svg className="w-8 h-8 text-red-600 ml-1" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z" />
                         </svg>

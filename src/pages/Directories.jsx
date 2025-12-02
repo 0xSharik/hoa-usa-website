@@ -117,7 +117,7 @@ const Directories = () => {
               <input
                 type="text"
                 placeholder="Search by company name or service..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-surface text-text placeholder-textMuted"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />

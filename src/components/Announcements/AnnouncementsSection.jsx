@@ -58,7 +58,7 @@ const AnnouncementsSection = () => {
 
   if (loading) {
     return (
-      <section className="py-20 bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 rounded-3xl shadow-2xl border border-white/40">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center">
             <motion.div
@@ -73,7 +73,7 @@ const AnnouncementsSection = () => {
 
   if (announcements.length === 0) {
     return (
-      <section className="py-20 bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50">
+      <section className="py-20 bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 rounded-3xl shadow-2xl border border-white/40">
         <div className="max-w-7xl mx-auto px-6">
           <AnimatedSection className="text-center">
             <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -88,7 +88,7 @@ const AnnouncementsSection = () => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50">
+    <section className="py-20 bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 rounded-3xl shadow-2xl border border-white/40">
       <div className="max-w-7xl mx-auto px-6">
         <AnimatedSection className="text-center mb-16">
           <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -96,7 +96,7 @@ const AnnouncementsSection = () => {
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Latest Announcements</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Stay updated with the latest news, updates, and important information from HOA-USA.
+            Stay updated with the latest news, updates, and important information from The Ridge.
           </p>
         </AnimatedSection>
 

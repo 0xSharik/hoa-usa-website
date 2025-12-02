@@ -3,30 +3,37 @@ import { motion } from 'framer-motion';
 import { submitComplaint } from '../../firebase/services/formService';
 import { AlertTriangle, User, Mail, Phone, Building, MessageSquare, Clock, CheckCircle } from 'lucide-react';
 
-const ComplaintForm = () => {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    hoaName: '',
-    complaintType: '',
-    subject: '',
-    description: '',
-    urgency: 'normal'
-  });
+const initialFormData = {
+  dateSubmitted: new Date().toISOString().split('T')[0],
+  name: '',
+  propertyAddress: '',
+  mailingAddress: '',
+  phone: '',
+  email: '',
+  complaintTypes: [],
+  otherComplaintType: '',
+  description: '',
+  evidenceFiles: null,
+  resolutionAttempted: '',
+  resolutionDescription: '',
+  desiredResolution: '',
+  signature: '',
+  signatureDate: new Date().toISOString().split('T')[0]
+};
 
+const ComplaintForm = () => {
+  const [formData, setFormData] = useState(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
-  const complaintTypes = [
-    'Maintenance Issue',
-    'Financial Dispute',
-    'Rule Violation',
-    'Noise Complaint',
-    'Parking Issue',
-    'Common Area Problem',
-    'Board Governance',
+  const complaintTypeOptions = [
+    'Noise / Nuisance',
+    'Property Maintenance / Violation',
+    'Landscaping',
+    'Parking / Vehicle Issue',
+    'Pets / Animals',
+    'Common Area Concern',
     'Other'
   ];
 
@@ -38,11 +45,31 @@ const ComplaintForm = () => {
   ];
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    const { name, value, type, checked, files } = e.target;
+    
+    if (type === 'checkbox') {
+      if (checked) {
+        setFormData(prev => ({
+          ...prev,
+          complaintTypes: [...prev.complaintTypes, value]
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          complaintTypes: prev.complaintTypes.filter(type => type !== value)
+        }));
+      }
+    } else if (type === 'file') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: files[0]
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -50,22 +77,15 @@ const ComplaintForm = () => {
     setIsSubmitting(true);
 
     try {
-      await submitComplaint(formData);
+      const sanitizedFormData = { ...formData };
+      delete sanitizedFormData.evidenceFiles;
+      await submitComplaint(sanitizedFormData);
       setSubmitted(true);
       
       // Reset form after 3 seconds
       setTimeout(() => {
         setSubmitted(false);
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          hoaName: '',
-          complaintType: '',
-          subject: '',
-          description: '',
-          urgency: 'normal'
-        });
+        setFormData(initialFormData);
       }, 3000);
     } catch (error) {
       console.error('Error submitting complaint:', error);
@@ -148,181 +168,317 @@ const ComplaintForm = () => {
             </div>
           )}
           
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Date Submitted */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <label className="block text-gray-700 text-sm font-bold mb-2">
+                Date Submitted:
+              </label>
+              <input
+                type="date"
+                name="dateSubmitted"
+                value={formData.dateSubmitted}
+                onChange={handleChange}
+                className="bg-transparent border-b-2 border-gray-300 focus:border-indigo-500 outline-none px-2 py-1"
+                readOnly
+              />
+            </div>
+
+            {/* 1. Homeowner Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
+                1. Homeowner Information
+              </h3>
+              
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-700 text-sm font-medium mb-2">
+                    Name: 
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border-b-2 border-gray-300 focus:border-indigo-500 outline-none bg-transparent"
+                    placeholder="Your full name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 text-sm font-medium mb-2">
+                    Phone Number: 
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-3 py-2 border-b-2 border-gray-300 focus:border-indigo-500 outline-none bg-transparent"
+                    placeholder="(123) 456-7890"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <User className="w-4 h-4 text-indigo-600" />
-                  Full Name *
+                <label className="block text-gray-700 text-sm font-medium mb-2">
+                  Property Address: 
                 </label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
+                  name="propertyAddress"
+                  value={formData.propertyAddress}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                  placeholder="John Doe"
+                  className="w-full px-3 py-2 border-b-2 border-gray-300 focus:border-indigo-500 outline-none bg-transparent"
+                  placeholder="123 Main St, Unit 4B"
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-indigo-600" />
-                  Email Address *
+                <label className="block text-gray-700 text-sm font-medium mb-2">
+                  Mailing Address (if different): 
+                </label>
+                <input
+                  type="text"
+                  name="mailingAddress"
+                  value={formData.mailingAddress}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border-b-2 border-gray-300 focus:border-indigo-500 outline-none bg-transparent"
+                  placeholder="456 PO Box, City, State 12345"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 text-sm font-medium mb-2">
+                  Email Address: 
                 </label>
                 <input
                   type="email"
-                  id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                  placeholder="john@example.com"
+                  className="w-full px-3 py-2 border-b-2 border-gray-300 focus:border-indigo-500 outline-none bg-transparent"
+                  placeholder="your.email@example.com"
                 />
               </div>
+            </div>
 
+            {/* 2. Nature of Complaint */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
+                2. Nature of Complaint
+              </h3>
+              
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-indigo-600" />
-                  Phone Number
+                <label className="block text-gray-700 text-sm font-medium mb-3">
+                  Type of Complaint (check all that apply):
+                </label>
+                <div className="space-y-2">
+                  {complaintTypeOptions.map((type) => (
+                    <label key={type} className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                      <input
+                        type="checkbox"
+                        name="complaintTypes"
+                        value={type}
+                        checked={formData.complaintTypes.includes(type)}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                      />
+                      <span className="text-gray-700"> {type}</span>
+                    </label>
+                  ))}
+                  {formData.complaintTypes.includes('Other') && (
+                    <input
+                      type="text"
+                      name="otherComplaintType"
+                      value={formData.otherComplaintType}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border-b-2 border-gray-300 focus:border-indigo-500 outline-none bg-transparent ml-7"
+                      placeholder="Please specify: ___________________________________________"
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Description of Complaint */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
+                3. Description of Complaint
+              </h3>
+              
+              <div>
+                <label className="block text-gray-700 text-sm font-medium mb-3">
+                  Please describe the issue in detail. Include specific dates, times, locations, and any individual involved (if known).
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  required
+                  rows={8}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-surface text-text placeholder-textMuted"
+                  placeholder="Provide detailed description of the complaint..."
+                />
+              </div>
+            </div>
+
+            {/* 4. Evidence or Documentation */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
+                4. Evidence or Documentation
+              </h3>
+              
+              <div>
+                <label className="block text-gray-700 text-sm font-medium mb-3">
+                  (Attach photos, letters, or other supporting materials if available.)
                 </label>
                 <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
+                  type="file"
+                  name="evidenceFiles"
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                  placeholder="(555) 123-4567"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="hoaName" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <Building className="w-4 h-4 text-indigo-600" />
-                  HOA/Community Name *
-                </label>
-                <input
-                  type="text"
-                  id="hoaName"
-                  name="hoaName"
-                  value={formData.hoaName}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                  placeholder="Sunset Valley HOA"
+                  accept="image/*,.pdf,.doc,.docx"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="complaintType" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-indigo-600" />
-                  Complaint Type *
+            {/* 5. Have You Attempted to Resolve the Issue? */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
+                5. Have You Attempted to Resolve the Issue?
+              </h3>
+              
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="resolutionAttempted"
+                    value="yes"
+                    checked={formData.resolutionAttempted === 'yes'}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-indigo-600 border-gray-300"
+                  />
+                  <span className="text-gray-700"> Yes</span>
                 </label>
-                <select
-                  id="complaintType"
-                  name="complaintType"
-                  value={formData.complaintType}
+                
+                {formData.resolutionAttempted === 'yes' && (
+                  <div>
+                    <label className="block text-gray-700 text-sm font-medium mb-2">
+                      If yes, please describe your efforts:
+                    </label>
+                    <textarea
+                      name="resolutionDescription"
+                      value={formData.resolutionDescription}
+                      onChange={handleChange}
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-surface text-text placeholder-textMuted"
+                      placeholder="Describe your attempts to resolve the issue..."
+                    />
+                  </div>
+                )}
+                
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="resolutionAttempted"
+                    value="no"
+                    checked={formData.resolutionAttempted === 'no'}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-indigo-600 border-gray-300"
+                  />
+                  <span className="text-gray-700"> No</span>
+                </label>
+              </div>
+            </div>
+
+            {/* 6. Desired Resolution */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
+                6. Desired Resolution
+              </h3>
+              
+              <div>
+                <label className="block text-gray-700 text-sm font-medium mb-3">
+                  What would you like the HOA to do regarding this issue?
+                </label>
+                <textarea
+                  name="desiredResolution"
+                  value={formData.desiredResolution}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                >
-                  <option value="">Select a type...</option>
-                  {complaintTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="urgency" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-indigo-600" />
-                  Urgency Level *
-                </label>
-                <select
-                  id="urgency"
-                  name="urgency"
-                  value={formData.urgency}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                >
-                  {urgencyLevels.map(level => (
-                    <option key={level.value} value={level.value}>{level.label}</option>
-                  ))}
-                </select>
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-surface text-text placeholder-textMuted"
+                  placeholder="Describe your desired resolution..."
+                />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-indigo-600" />
-                Subject *
-              </label>
-              <input
-                type="text"
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                placeholder="Brief description of the issue"
-              />
+            {/* 7. Signature */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
+                7. Signature
+              </h3>
+              
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <p className="text-gray-700 text-sm mb-4">
+                  I certify that the information provided is true and accurate to the best of my knowledge.
+                </p>
+                
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-gray-700 text-sm font-medium mb-2">
+                      Signature: 
+                    </label>
+                    <input
+                      type="text"
+                      name="signature"
+                      value={formData.signature}
+                      onChange={handleChange}
+                      required
+                      className="w-full px-3 py-2 border-b-2 border-gray-300 focus:border-indigo-500 outline-none bg-transparent"
+                      placeholder="Type your full name as signature"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-gray-700 text-sm font-medium mb-2">
+                      Date: 
+                    </label>
+                    <input
+                      type="date"
+                      name="signatureDate"
+                      value={formData.signatureDate}
+                      onChange={handleChange}
+                      className="bg-transparent border-b-2 border-gray-300 focus:border-indigo-500 outline-none px-2 py-1"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-indigo-600" />
-                Detailed Description *
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                required
-                rows={6}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition resize-none"
-                placeholder="Please provide a detailed description of your complaint, including dates, locations, and any relevant parties involved..."
-              />
-            </div>
-
-            <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
-              <p className="text-sm text-gray-700">
-                <strong>Privacy Notice:</strong> Your complaint will be handled confidentially and reviewed by our team. 
-                We may share relevant information with your HOA for resolution purposes. By submitting this form, 
-                you agree to our privacy policy and terms of service.
-              </p>
-            </div>
-
-            <div className="flex justify-center">
+            <div className="flex justify-center pt-6">
               <motion.button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-8 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-8 rounded-lg transition duration-300 shadow-lg hover:shadow-xl flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 whileHover={{ scale: isSubmitting ? 1 : 1.05 }}
                 whileTap={{ scale: isSubmitting ? 1 : 0.95 }}
               >
                 {isSubmitting ? (
-                  <span className="flex items-center">
-                    <motion.div
-                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-3"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    />
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     Submitting...
-                  </span>
+                  </>
                 ) : (
-                  <span className="flex items-center gap-2">
+                  <>
                     <AlertTriangle className="w-5 h-5" />
                     Submit Complaint
-                  </span>
+                  </>
                 )}
               </motion.button>
             </div>

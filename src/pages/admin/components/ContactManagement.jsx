@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAllContacts, updateContactStatus, deleteContact } from '../../../firebase/services/formService';
+import { sendEmailReply } from '../../../firebase/services/emailService';
 
 const ContactManagement = () => {
   const [contacts, setContacts] = useState([]);
@@ -7,6 +8,9 @@ const ContactManagement = () => {
   const [error, setError] = useState('');
   const [selectedContact, setSelectedContact] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [replyMessage, setReplyMessage] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     loadContacts();
@@ -50,6 +54,38 @@ const ContactManagement = () => {
     }
   };
 
+  const handleSendReply = async () => {
+    if (!selectedContact) return;
+    
+    try {
+      setSendingEmail(true);
+      await sendEmailReply('contactReply', selectedContact, replyMessage);
+      
+      // Update status to 'replied'
+      await updateContactStatus(selectedContact.id, 'replied');
+      await loadContacts();
+      
+      // Close modal and reset
+      setShowReplyModal(false);
+      setReplyMessage('');
+      setSelectedContact(null);
+      setError('');
+      
+      alert('Reply sent successfully!');
+    } catch (error) {
+      setError('Failed to send reply: ' + error.message);
+      console.error(error);
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
+  const openReplyModal = (contact) => {
+    setSelectedContact(contact);
+    setShowReplyModal(true);
+    setReplyMessage('');
+  };
+
   const filteredContacts = contacts.filter(contact => 
     filterStatus === 'all' || contact.status === filterStatus
   );
@@ -60,6 +96,7 @@ const ContactManagement = () => {
       case 'in-progress': return 'bg-blue-100 text-blue-800';
       case 'resolved': return 'bg-green-100 text-green-800';
       case 'rejected': return 'bg-red-100 text-red-800';
+      case 'replied': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -239,6 +276,78 @@ const ContactManagement = () => {
                   <p className="text-gray-700">{formatDate(selectedContact.createdAt)}</p>
                 </div>
               </div>
+              
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => openReplyModal(selectedContact)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Send Email Reply
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Reply Modal */}
+      {showReplyModal && selectedContact && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-4">Send Email Reply</h3>
+            
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+              <h4 className="font-semibold mb-3">Replying to Contact:</h4>
+              <div className="space-y-2">
+                <p><strong>Name:</strong> {selectedContact.name}</p>
+                <p><strong>Email:</strong> {selectedContact.email}</p>
+                {selectedContact.phone && <p><strong>Phone:</strong> {selectedContact.phone}</p>}
+                <p><strong>Subject:</strong> {selectedContact.subject || 'No subject'}</p>
+                <p><strong>Status:</strong> 
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedContact.status)}`}>
+                    {selectedContact.status}
+                  </span>
+                </p>
+                <p><strong>Submitted:</strong> {formatDate(selectedContact.createdAt)}</p>
+                {selectedContact.message && (
+                  <div>
+                    <p><strong>Original Message:</strong></p>
+                    <div className="mt-1 p-2 bg-white border border-gray-200 rounded text-sm">
+                      {selectedContact.message}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Custom Message (Optional)
+              </label>
+              <textarea
+                value={replyMessage}
+                onChange={(e) => setReplyMessage(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                rows={6}
+                placeholder="Add your custom message here..."
+              />
+            </div>
+            
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowReplyModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                disabled={sendingEmail}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendReply}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                disabled={sendingEmail}
+              >
+                {sendingEmail ? 'Sending...' : 'Send Reply'}
+              </button>
             </div>
           </div>
         </div>

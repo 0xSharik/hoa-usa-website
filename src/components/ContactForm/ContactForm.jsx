@@ -127,7 +127,7 @@ const ContactForm = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
                   <User className="w-4 h-4 text-indigo-600" />
                   Full Name *
                 </label>
@@ -138,15 +138,15 @@ const ContactForm = () => {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                  placeholder="John Doe"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 bg-surface text-text placeholder-textMuted"
+                  placeholder="JoOOhn Doe"
                 />
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
                   <Mail className="w-4 h-4 text-indigo-600" />
-                  Email Address *
+                  EmaAAil ADDdreSS *
                 </label>
                 <input
                   type="email"
@@ -155,13 +155,13 @@ const ContactForm = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 bg-surface text-text placeholder-textMuted"
                   placeholder="john@example.com"
                 />
               </div>
 
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
                   <Phone className="w-4 h-4 text-indigo-600" />
                   Phone Number
                 </label>
@@ -171,13 +171,13 @@ const ContactForm = () => {
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 bg-surface text-text placeholder-textMuted"
                   placeholder="(555) 123-4567"
                 />
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <label htmlFor="subject" className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-indigo-600" />
                   Subject *
                 </label>
@@ -188,14 +188,14 @@ const ContactForm = () => {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                  placeholder="How can we help you?"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 bg-surface text-text placeholder-textMuted"
+                  placeholder="How can we help?"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+              <label htmlFor="message" className="block text-gray-700 text-sm font-bold mb-2 flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-indigo-600" />
                 Message *
               </label>
@@ -206,8 +206,8 @@ const ContactForm = () => {
                 onChange={handleChange}
                 required
                 rows={6}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition resize-none"
-                placeholder="Please tell us more about your inquiry..."
+                className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 resize-none bg-surface text-text placeholder-textMuted"
+                placeholder="Your message here..."
               />
             </div>
 

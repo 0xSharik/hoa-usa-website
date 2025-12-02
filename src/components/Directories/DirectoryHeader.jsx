@@ -6,10 +6,10 @@ const DirectoryHeader = () => {
     <div className="bg-gradient-to-r from-primary to-secondary py-12 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">HOA-USA Management Directory</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">The Ridge Management Directory</h1>
           <p className="text-lg md:text-xl max-w-4xl mx-auto mb-8">
             The following list of management companies is provided as a convenient reference for board members, 
-            closing attorneys, realtors, homebuyers, and association residents. Search the HOA-USA Management 
+            closing attorneys, realtors, homebuyers, and association residents. Search the The Ridge Management 
             Company Directory for Association Managers in your region.
           </p>
           

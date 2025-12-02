@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { uploadImage as uploadToFirebase } from '../../../utils/firebaseStorage';
 
 const AdvertiserForm = ({ onSave, onCancel, advertiser = null }) => {
   const [formData, setFormData] = useState(() => ({

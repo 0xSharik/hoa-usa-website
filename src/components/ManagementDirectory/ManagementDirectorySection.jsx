@@ -7,7 +7,7 @@ const ManagementDirectorySection = () => {
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center">
         <div className="lg:w-0 lg:flex-1">
           <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            HOA-USA Management Directory
+            The Ridge Management Directory
           </h2>
           <p className="mt-3 max-w-3xl text-lg leading-6 text-gray-500">
             The following list of management companies is provided as a convenient reference for board members, 

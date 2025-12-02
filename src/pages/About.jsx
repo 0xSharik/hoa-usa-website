@@ -7,7 +7,7 @@ import { Building2, Users, BookOpen, Award, Target, Shield, TrendingUp, CheckCir
 const About = () => {
   return (
     <SubpageLayout 
-      title="About HOA-USA"
+      title="About The Ridge"
       description="Supporting homeowner associations across the United States with resources and tools"
     >
       <div className="bg-white">
@@ -27,7 +27,7 @@ const About = () => {
                   </div>
                   <span className="text-indigo-200 font-medium">Leading HOA Resource Platform</span>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">About HOA-USA</h1>
+                <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">About The Ridge</h1>
                 <p className="text-xl mb-8 leading-relaxed text-indigo-100">
                   There are over 370,000 homeowner associations in the United States. Collectively, this represents over 40 million households (over 53% of the owner occupied households in America).
                 </p>
@@ -140,11 +140,11 @@ const About = () => {
             >
               <div className="prose prose-lg text-gray-700 max-w-none">
                 <p className="mb-6 text-lg leading-relaxed">
-                  HOA-USA is dedicated to providing resources that promote a better understanding and governance of townhome, condominium, and single family homeowner associations.
+                  The Ridge is dedicated to providing resources that promote a better understanding and governance of townhome, condominium, and single family homeowner associations.
                 </p>
                 
                 <p className="mb-6 text-lg leading-relaxed">
-                  It also represents millions of volunteers that serve on homeowner association boards and committees. HOA-USA was created to help those volunteers navigate the complexities of serving on boards of homeowner associations by providing the tools and resources they need in one convenient place to make their job as a volunteer as easy and stress-free as possible.
+                  It also represents millions of volunteers that serve on homeowner association boards and committees. The Ridge was created to help those volunteers navigate the complexities of serving on boards of homeowner associations by providing the tools and resources they need in one convenient place to make their job as a volunteer as easy and stress-free as possible.
                 </p>
 
                 <div className="grid md:grid-cols-2 gap-6 mb-8">

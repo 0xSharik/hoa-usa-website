@@ -1,0 +1,82 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             request.auth.token.admin == true;
+    }
+    
+    // Public images - anyone can read, admin can write
+    match /images/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Vendor logos - public read, admin write
+    match /vendor-logos/{vendorId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Article thumbnails - public read, admin write
+    match /article-thumbnails/{articleId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Video thumbnails - public read, admin write
+    match /video-thumbnails/{videoId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Newsletter covers - public read, admin write
+    match /newsletter-covers/{newsletterId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Admin uploads - admin only
+    match /admin-uploads/{allPaths=**} {
+      allow read, write: if isAdmin();
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // User uploads - authenticated users can upload to their own folder
+    match /user-uploads/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Documents - public read, admin write
+    match /documents/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+      allow create: if isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

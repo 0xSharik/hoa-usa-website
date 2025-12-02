@@ -11,6 +11,7 @@ import {
   MorphingShape,
   animations 
 } from '../../utils/animations.jsx';
+import backgroundImage from '../../assets/bg.jpg';
 
 // Hero Section with Parallax
 const Hero = () => {
@@ -18,11 +19,22 @@ const Hero = () => {
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 150]);
   const y2 = useTransform(scrollY, [0, 500], [0, -100]);
-  const opacity = useTransform(scrollY, [0, 600], [1, 0]);
-  const scale = useTransform(scrollY, [0, 600], [1, 0.95]);
+  const opacity = useTransform(scrollY, [500, 1000], [1, 0]);
+  const scale = useTransform(scrollY, [500, 1000], [1, 0.95]);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-25">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${backgroundImage})`
+        }}
+      ></div>
+      
+      {/* Overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/70 via-indigo-800/50 to-purple-900/70"></div>
+      
       {/* Animated Background Grid */}
       <div className="absolute inset-0 opacity-20">
         <motion.div 
@@ -32,7 +44,7 @@ const Hero = () => {
           {[...Array(20)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-px bg-gradient-to-b from-transparent via-indigo-400 to-transparent"
+              className="absolute w-px bg-gradient-to-b from-transparent via-white/30 to-transparent"
               style={{
                 left: `${i * 5}%`,
                 height: '100%',
@@ -57,12 +69,12 @@ const Hero = () => {
           key={i}
           className="absolute rounded-full blur-3xl"
           style={{
-            background: i % 2 === 0 ? 'var(--primary)' : 'var(--secondary)',
+            background: i % 2 === 0 ? 'rgba(255, 255, 255, 0.1)' : 'rgba(199, 210, 254, 0.2)',
             width: `${200 + i * 50}px`,
             height: `${200 + i * 50}px`,
             left: `${20 + i * 15}%`,
             top: `${10 + i * 10}%`,
-            opacity: 0.1
+            opacity: 0.3
           }}
           animate={{
             x: [0, 50, 0],
@@ -88,18 +100,18 @@ const Hero = () => {
         >
           {/* Badge */}
           <motion.div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 border border-indigo-200 backdrop-blur-sm mb-8"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-8"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <Award className="w-4 h-4 text-amber-400" />
-            <span className="text-sm text-indigo-700 font-medium">Trusted by 50,000+ Communities</span>
+            <Award className="w-4 h-4 text-yellow-400" />
+            <span className="text-sm text-white font-medium">Trusted by 50,000+ Communities</span>
           </motion.div>
 
           <h1 className="text-6xl md:text-8xl font-bold mb-6 leading-tight">
             <motion.span 
-              className="block text-gray-900"
+              className="block text-white"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -107,28 +119,29 @@ const Hero = () => {
               Welcome to
             </motion.span>
             <motion.span
-              className="block bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent"
+              className="block bg-gradient-to-r from-white via-indigo-100 to-white bg-clip-text text-transparent"
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              style={{ backgroundSize: '200% 200%' }}
-              animate={{
+              animate={{ 
+                opacity: 1, 
+                y: 0,
                 backgroundPosition: ['0% 50%', '100% 50%', '0% 50%']
               }}
-              transition={{
+              transition={{ 
+                delay: 0.5,
                 backgroundPosition: {
                   duration: 5,
                   repeat: Infinity,
                   ease: "linear"
                 }
               }}
+              style={{ backgroundSize: '200% 200%' }}
             >
-              HOA-USA
+              The Ridge
             </motion.span>
           </h1>
 
           <motion.p
-            className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed"
+            className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-12 leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
@@ -148,16 +161,18 @@ const Hero = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500"
-                initial={{ x: '-100%' }}
-                whileHover={{ x: 0 }}
-                transition={{ duration: 0.3 }}
-              />
-              <span className="relative z-10 flex items-center gap-2">
-                Explore Directories
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
+              <Link to="/directories/vendors" className="relative z-10 flex items-center gap-2">
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+                <span className="relative z-10 flex items-center gap-2">
+                  Explore Vendor Directory
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </Link>
             </motion.button>
 
             <motion.button
@@ -165,7 +180,10 @@ const Hero = () => {
               whileHover={{ scale: 1.05, borderColor: 'var(--primary)' }}
               whileTap={{ scale: 0.95 }}
             >
-              View Resources
+              <Link to="/resources" className="flex items-center gap-2">
+                View Resources
+                <ArrowRight className="w-5 h-5" />
+              </Link>
             </motion.button>
           </motion.div>
         </motion.div>
@@ -184,28 +202,28 @@ const Hero = () => {
           ].map((feature, i) => (
             <motion.div
               key={i}
-              className="group relative p-8 rounded-2xl bg-white/80 backdrop-blur-md border border-indigo-100 hover:bg-white transition-all cursor-pointer overflow-hidden"
+              className="group relative p-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 transition-all cursor-pointer overflow-hidden"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.3 + i * 0.1 }}
               whileHover={{ y: -5 }}
             >
               <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10"
+                className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/10"
                 initial={{ opacity: 0 }}
                 whileHover={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               />
               <div className="relative z-10">
                 <motion.div
-                  className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mb-4"
+                  className="w-14 h-14 rounded-xl bg-gradient-to-br from-white/20 to-white/10 flex items-center justify-center mb-4 backdrop-blur-sm border border-white/30"
                   whileHover={{ rotate: 360, scale: 1.1 }}
                   transition={{ duration: 0.6 }}
                 >
                   <feature.icon className="w-7 h-7 text-white" />
                 </motion.div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
+                <p className="text-white/80">{feature.description}</p>
               </div>
             </motion.div>
           ))}
@@ -218,7 +236,7 @@ const Hero = () => {
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        <ChevronDown className="w-8 h-8 text-indigo-600" />
+        <ChevronDown className="w-8 h-8 text-white/60" />
       </motion.div>
     </section>
   );
@@ -391,8 +409,10 @@ const DirectoriesSection = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  Explore Now
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <Link to={item.title === "Vendor Directory" ? "/directories/vendors" : "/directories/management"} className="flex items-center gap-2">
+                    Explore {item.title}
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
                 </motion.button>
               </div>
 

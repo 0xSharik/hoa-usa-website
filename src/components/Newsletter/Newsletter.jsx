@@ -67,12 +67,12 @@ const Newsletter = () => {
                     textShadow: isHovered ? '0 4px 8px rgba(59, 130, 246, 0.1)' : 'none'
                   }}
                 >
-                  Stay Informed with HOA-USA
+                  Stay Informed with The Ridge
                 </h2>
                 
                 <p className="text-gray-600 text-center mb-10 text-lg leading-relaxed">
                   The best way for HOA board members, residents, and community managers to stay informed with constantly 
-                  changing trends and best practices is to subscribe to the HOA-USA e-newsletter. Your information is 
+                  changing trends and best practices is to subscribe to the The Ridge e-newsletter. Your information is 
                   never shared, and the content you receive will benefit your community.
                 </p>
               </div>
@@ -126,13 +126,8 @@ const Newsletter = () => {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      onFocus={() => setFocusedField('email')}
-                      onBlur={() => setFocusedField(null)}
                       placeholder="Enter your email"
-                      className="relative w-full px-5 py-4 bg-white border-2 border-gray-200 rounded-xl text-gray-700 font-medium shadow-lg hover:shadow-xl hover:border-blue-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300"
-                      style={{
-                        transform: focusedField === 'email' ? 'scale(1.02)' : 'scale(1)'
-                      }}
+                      className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 bg-surface text-text placeholder-textMuted"
                       required
                     />
                   </div>

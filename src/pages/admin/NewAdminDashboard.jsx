@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ComplaintManagement from './components/ComplaintManagement';
-import ContactManagement from './components/ContactManagement';
-import VendorsEditor from './components/VendorsEditor';
-import AdvertisersEditor from './components/AdvertisersEditor';
 import AnnouncementManagement from './components/AnnouncementManagement';
 import ResourcesEditor from './components/ResourcesEditor';
-import { Menu, X, Home, BarChart3, Megaphone, BookOpen, Store, Users, Video, FileText, MessageSquare, LogOut } from 'lucide-react';
+import { Menu, X, Home, BarChart3, Megaphone, BookOpen, MessageSquare, LogOut } from 'lucide-react';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -23,10 +20,7 @@ const AdminDashboard = () => {
     { id: 'overview', label: 'Dashboard Overview', icon: BarChart3 },
     { id: 'announcements', label: 'Announcements', icon: Megaphone },
     { id: 'resources', label: 'Resources', icon: BookOpen },
-    { id: 'vendors', label: 'Vendors Editor', icon: Store },
-    { id: 'advertisers', label: 'Advertisers Editor', icon: Users },
-    { id: 'complaints', label: 'Complaint Management', icon: MessageSquare },
-    { id: 'contacts', label: 'Contact Forms', icon: FileText }
+    { id: 'complaints', label: 'Complaint Management', icon: MessageSquare }
   ];
 
   const renderContent = () => {
@@ -37,14 +31,8 @@ const AdminDashboard = () => {
         return <AnnouncementManagement />;
       case 'resources':
         return <ResourcesEditor />;
-      case 'vendors':
-        return <VendorsEditor />;
-      case 'advertisers':
-        return <AdvertisersEditor />;
       case 'complaints':
         return <ComplaintManagement />;
-      case 'contacts':
-        return <ContactManagement />;
       default:
         return <DashboardOverview />;
     }
@@ -198,30 +186,10 @@ const DashboardOverview = () => {
         <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Vendors</p>
-              <p className="text-2xl font-bold text-gray-900">2</p>
+              <p className="text-sm text-gray-600">Total Documents</p>
+              <p className="text-2xl font-bold text-gray-900">0</p>
             </div>
-            <div className="text-3xl">🏪</div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Advertisers</p>
-              <p className="text-2xl font-bold text-gray-900">3</p>
-            </div>
-            <div className="text-3xl">📢</div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Videos</p>
-              <p className="text-2xl font-bold text-gray-900">2</p>
-            </div>
-            <div className="text-3xl">🎥</div>
+            <div className="text-3xl">📄</div>
           </div>
         </div>
         
@@ -234,32 +202,9 @@ const DashboardOverview = () => {
             <div className="text-3xl">📝</div>
           </div>
         </div>
-        
-        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Contact Forms</p>
-              <p className="text-2xl font-bold text-gray-900">0</p>
-            </div>
-            <div className="text-3xl">📧</div>
-          </div>
-        </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <button className="p-4 bg-indigo-50 hover:bg-indigo-100 rounded-lg text-indigo-700 font-medium transition-colors">
-            Add New Vendor
-          </button>
-          <button className="p-4 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 font-medium transition-colors">
-            Add New Advertiser
-          </button>
-          <button className="p-4 bg-blue-50 hover:bg-blue-100 rounded-lg text-blue-700 font-medium transition-colors">
-            Add New Video
-          </button>
-        </div>
-      </div>
+      
     </div>
   );
 };

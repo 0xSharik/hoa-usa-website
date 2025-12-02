@@ -201,7 +201,7 @@ const VendorDirectory = () => {
                   type="text"
                   id="search"
                   placeholder="Search by name or description..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-surface text-text placeholder-textMuted"
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import logo from '../../assets/logo.png';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,14 +9,12 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
 
   const location = useLocation();
-  const navigate = useNavigate();
 
   // Custom Link component that scrolls to top
-  const ScrollToTopLink = ({ to, children, className, onClick, ...props }) => {
+  const ScrollToTopLink = ({ to, onClick, children, className, ...props }) => {
     const handleClick = (e) => {
-      e.preventDefault();
-      navigate(to);
-      window.scrollTo(0, 0);
+      // Immediate scroll for faster perceived navigation
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       if (onClick) onClick(e);
     };
 
@@ -30,10 +29,7 @@ const Navbar = () => {
     { name: "Home" },
     { name: "About" },
     { name: "Resources" },
-    {
-      name: "Directories",
-      submenu: [{ name: "Vendor Directory", path: "/directories/vendors" }],
-    },
+    { name: "Vendor Directory" },
     { name: "Advertise" },
     { name: "Contact" },
   ];
@@ -105,21 +101,28 @@ const Navbar = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-3"
             >
-              <ScrollToTopLink
-                to="/"
-                className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-sm"
-              >
-                HOA-USA
+              {/* Logo Image */}
+              <ScrollToTopLink to="/" className="flex items-center gap-3">
+                <img 
+                  src={logo} 
+                  alt="The Ridge" 
+                  className="h-10 w-auto object-contain"
+                  style={{ maxHeight: '40px' }}
+                />
+                <span className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-sm">
+                  The Ridge
+                </span>
               </ScrollToTopLink>
             </motion.div>
 
             {/* DESKTOP NAV */}
             <div className="hidden md:flex items-center space-x-6">
               {navItems.map((item, index) => {
-                const path = `/${item.name
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")}`;
+                const path = item.name === "Vendor Directory" 
+                  ? "/directories/vendors" 
+                  : `/${item.name.toLowerCase().replace(/\s+/g, "-")}`;
 
                 return (
                   <motion.div
@@ -221,9 +224,9 @@ const Navbar = () => {
             >
               <div className="px-4 py-4 space-y-2">
                 {navItems.map((item) => {
-                  const path = `/${item.name
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")}`;
+                  const path = item.name === "Vendor Directory" 
+                    ? "/directories/vendors" 
+                    : `/${item.name.toLowerCase().replace(/\s+/g, "-")}`;
 
                   return (
                     <ScrollToTopLink

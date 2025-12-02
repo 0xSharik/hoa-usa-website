@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FaFacebook, FaTwitter, FaLinkedin } from 'react-icons/fa';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [hoveredLink, setHoveredLink] = useState(null);
-  const [focusedInput, setFocusedInput] = useState(null);
   const [hoveredSocial, setHoveredSocial] = useState(null);
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-  };
-  
   return (
     <footer className="relative bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white pt-20 pb-8 overflow-hidden">
       {/* Animated background elements */}
@@ -57,7 +51,9 @@ const Footer = () => {
                   ].map((social) => (
                     <a
                       key={social.name}
-                      href="#"
+                      href={`https://${social.name}.com`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="relative group/social"
                       aria-label={social.name}
                       onMouseEnter={() => setHoveredSocial(social.name)}
@@ -89,10 +85,10 @@ const Footer = () => {
               <div className="h-1 w-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full group-hover:w-24 transition-all duration-500"></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              {['Home', 'About', 'Articles', 'Directories', 'State Laws', 'Privacy & Terms', 'Advertise', 'Contact'].map((link, index) => (
-                <a
+              {['Home', 'About', 'Articles', 'Vendor Directory', 'Advertise', 'Contact'].map((link, index) => (
+                <Link
                   key={link}
-                  href="#"
+                  to={link === 'Home' ? '/' : `/${link.toLowerCase().replace(' & ', '-').replace(' ', '-')}`}
                   className="relative group/link py-2"
                   onMouseEnter={() => setHoveredLink(link)}
                   onMouseLeave={() => setHoveredLink(null)}
@@ -108,7 +104,7 @@ const Footer = () => {
                     {link}
                   </span>
                   <div className="absolute left-0 bottom-0 h-0.5 w-0 bg-gradient-to-r from-blue-500 to-indigo-500 group-hover/link:w-full transition-all duration-300"></div>
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -122,69 +118,43 @@ const Footer = () => {
               <div className="h-1 w-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full group-hover:w-24 transition-all duration-500"></div>
             </div>
             <div className="space-y-4">
-              {[
-                { type: 'text', placeholder: 'Your Name', name: 'name' },
-                { type: 'email', placeholder: 'Your Email', name: 'email' }
-              ].map((field) => (
-                <div key={field.name} className="relative">
-                  <div className={`absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg blur-md opacity-0 transition-opacity duration-300 ${focusedInput === field.name ? 'opacity-40' : ''}`}></div>
-                  <input
-                    type={field.type}
-                    placeholder={field.placeholder}
-                    value={formData[field.name]}
-                    onChange={(e) => setFormData({...formData, [field.name]: e.target.value})}
-                    className="relative w-full px-4 py-3 bg-gray-900/50 backdrop-blur-sm border-2 border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:bg-gray-900/80 transition-all duration-300"
-                    onFocus={() => setFocusedInput(field.name)}
-                    onBlur={() => setFocusedInput(null)}
-                    style={{
-                      transform: focusedInput === field.name ? 'translateY(-2px)' : 'translateY(0)'
-                    }}
-                  />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-indigo-600/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
                 </div>
-              ))}
-              
-              <div className="relative">
-                <div className={`absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg blur-md opacity-0 transition-opacity duration-300 ${focusedInput === 'message' ? 'opacity-40' : ''}`}></div>
-                <textarea
-                  rows="3"
-                  placeholder="Your Message"
-                  value={formData.message}
-                  onChange={(e) => setFormData({...formData, message: e.target.value})}
-                  className="relative w-full px-4 py-3 bg-gray-900/50 backdrop-blur-sm border-2 border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:bg-gray-900/80 transition-all duration-300 resize-none"
-                  onFocus={() => setFocusedInput('message')}
-                  onBlur={() => setFocusedInput(null)}
-                  style={{
-                    transform: focusedInput === 'message' ? 'translateY(-2px)' : 'translateY(0)'
-                  }}
-                ></textarea>
+                <div>
+                  <Link to="/contact" className="text-gray-300 hover:text-white transition-colors duration-300">
+                    info@hoa-usa.com
+                  </Link>
+                </div>
               </div>
               
-              <button
-                onClick={handleSubmit}
-                className="relative w-full py-3 font-semibold text-white overflow-hidden rounded-lg group/btn"
-                style={{
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 10px 30px rgba(59, 130, 246, 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500"></div>
-                <div className="absolute inset-0 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-700">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000"></div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-indigo-600/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
                 </div>
-                <span className="relative z-10 flex items-center justify-center gap-2">
+                <div>
+                  <Link to="tel:1-800-HOA-USA" className="text-gray-300 hover:text-white transition-colors duration-300">
+                    1-800-HOA-USA
+                  </Link>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <Link
+                  to="/contact"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                >
                   Send Message
-                  <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
-                </span>
-              </button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -194,7 +164,7 @@ const Footer = () => {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent"></div>
           <p className="text-center text-gray-500 text-sm">
             <span className="inline-block hover:text-gray-300 transition-colors duration-300">
-              &copy; {currentYear} HOA-USA. All rights reserved.
+              &copy; {currentYear} The Ridge. All rights reserved.
             </span>
           </p>
         </div>
