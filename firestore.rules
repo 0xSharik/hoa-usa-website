@@ -3,6 +3,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     // Helper functions
+    // Note: 'request.auth != null' includes anonymous users.
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -17,28 +18,20 @@ service cloud.firestore {
              request.auth.uid == userId;
     }
     
-    // Public collections - anyone can read, only admins can write
-    match /articles/{docId} {
+    // Documents collection - anyone can read, authenticated users can write
+    match /documents/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
-    }
-    
-    match /videos/{docId} {
-      allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
-      allow update: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
       allow delete: if isAdmin();
     }
     
     match /newsletters/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
-      allow update: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
       allow delete: if isAdmin();
     }
     
@@ -59,34 +52,34 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     
-    // Contact forms and submissions - anyone can create, admin can read
+    // Contact forms and submissions - anyone can create, read, update, delete
     match /contacts/{docId} {
       allow create: if true;
-      allow read: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow read: if true;
+      allow update: if true;
+      allow delete: if true;
     }
     
     match /complaints/{docId} {
       allow create: if true;
-      allow read: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow read: if true;
+      allow update: if true;
+      allow delete: if true;
     }
     
     // Keep the old names for backward compatibility
     match /contactSubmissions/{docId} {
       allow create: if true;
-      allow read: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow read: if true;
+      allow update: if true;
+      allow delete: if true;
     }
     
     match /complaintSubmissions/{docId} {
       allow create: if true;
-      allow read: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow read: if true;
+      allow update: if true;
+      allow delete: if true;
     }
     
     // Newsletter subscriptions - anyone can create, admin can read
@@ -97,12 +90,12 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     
-    // Announcements - public read, admin write
+    // Announcements - public read, authenticated users can write
     match /announcements/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
-      allow update: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
       allow delete: if isAdmin();
     }
     

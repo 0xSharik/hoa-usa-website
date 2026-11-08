@@ -11,7 +11,6 @@ import {
   ArrowRight,
   Building2
 } from 'lucide-react';
-import ComplaintForm from '../components/ComplaintForm/ComplaintForm';
 import ContactForm from '../components/ContactForm/ContactForm';
 
 const Contact = () => {
@@ -61,50 +60,8 @@ const Contact = () => {
     }
   };
 
-  const contactMethods = [
-    {
-      icon: <Phone className="w-6 h-6 text-indigo-600" />,
-      title: 'Call Us',
-      details: ['+1 (800) 123-4567', 'Mon-Fri: 9am-6pm EST'],
-      link: 'tel:+18001234567',
-      linkText: 'Call Now'
-    },
-    {
-      icon: <Mail className="w-6 h-6 text-indigo-600" />,
-      title: 'Email Us',
-      details: ['info@the-ridge.com', 'support@the-ridge.com'],
-      link: 'mailto:info@the-ridge.com',
-      linkText: 'Send Email'
-    },
-    {
-      icon: <MapPin className="w-6 h-6 text-indigo-600" />,
-      title: 'Visit Us',
-      details: ['123 HOA Center', 'Suite 100', 'Raleigh, NC 27601'],
-      link: 'https://maps.google.com',
-      linkText: 'Get Directions',
-      target: '_blank'
-    }
-  ];
-
-  const faqs = [
-    {
-      question: 'What are your customer service hours?',
-      answer: 'Our customer service team is available Monday through Friday, 9:00 AM to 6:00 PM EST.'
-    },
-    {
-      question: 'How can I update my account information?',
-      answer: 'You can update your account information by logging into your account and accessing the profile settings.'
-    },
-    {
-      question: 'Do you offer support for HOA board members?',
-      answer: 'Yes, we offer dedicated support for HOA board members. Please contact our support team for assistance.'
-    },
-    {
-      question: 'How do I report a website issue?',
-      answer: 'Please use the contact form above to report any website issues you encounter.'
-    }
-  ];
-
+  
+  
   return (
     <div className="min-h-screen pt-24">
       {/* Hero Section */}
@@ -133,55 +90,7 @@ const Contact = () => {
         </div>
       </div>
 
-      {/* Contact Methods */}
-      <section className="py-16 bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Get in Touch</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Choose the most convenient way to reach our support team
-            </p>
-          </motion.div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {contactMethods.map((method, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 * index }}
-                className="bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 text-center group"
-                whileHover={{ y: -5 }}
-              >
-                <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-indigo-200 transition-colors">
-                  {method.icon}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{method.title}</h3>
-                <div className="space-y-2 mb-6">
-                  {method.details.map((detail, i) => (
-                    <p key={i} className="text-gray-600">{detail}</p>
-                  ))}
-                </div>
-                <a 
-                  href={method.link} 
-                  target={method.target || '_self'}
-                  rel={method.target ? 'noopener noreferrer' : ''}
-                  className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 font-semibold group-hover:gap-3 transition-all"
-                >
-                  {method.linkText}
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      
       {/* Address and Image Section */}
       <section className="py-16 bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -307,89 +216,23 @@ const Contact = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Get in Touch</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Get in Touch with us</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Use the forms below to send us a message or file a complaint. We'll respond as soon as possible.
+              Use the form below to send us a message. We'll respond as soon as possible.
             </p>
           </motion.div>
           
-          <div className="space-y-16">
-            {/* Contact Form */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
-            >
-              <ContactForm />
-            </motion.div>
-            
-            {/* Complaint Form */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-            >
-              <ComplaintForm />
-            </motion.div>
-          </div>
-        </div>
-      </section>
-      {/* FAQ Section */}
-      <section className="py-16 bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Contact Form */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="text-center mb-12"
+            transition={{ duration: 0.8, delay: 0.7 }}
           >
-            <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <MessageSquare className="w-8 h-8 text-indigo-600" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-            <p className="text-xl text-gray-600">Find answers to common questions below</p>
-          </motion.div>
-          
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
-                className="bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
-              >
-                <button className="w-full px-6 py-4 text-left focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-inset">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-900">{faq.question}</h3>
-                    <ArrowRight className="h-5 w-5 text-indigo-600 transform rotate-90" />
-                  </div>
-                </button>
-                <div className="px-6 pb-4">
-                  <p className="text-gray-600">{faq.answer}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-12 text-center"
-          >
-            <p className="text-gray-600 mb-6">Still have questions?</p>
-            <a
-              href="#contact-form"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors"
-            >
-              Contact Support
-              <ArrowRight className="w-4 h-4" />
-            </a>
+            <ContactForm />
           </motion.div>
         </div>
       </section>
-
+      
     </div>
   );
 };

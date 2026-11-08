@@ -8,6 +8,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import AnnouncementsSection from '../Announcements/AnnouncementsSection';
+import ComplaintForm from '../ComplaintForm/ComplaintForm';
 
 // --- Main HomeContent Component ---
 const HomeContent = () => {
@@ -22,6 +23,14 @@ const HomeContent = () => {
 
         {/* Announcements Section */}
         <AnnouncementsSection />
+
+        {/* Spacer */}
+        <div className="py-12"></div>
+
+        {/* Complaint Form Section */}
+        <section className="py-20 bg-gradient-to-br from-gray-50 via-indigo-50 to-purple-50 rounded-3xl shadow-2xl border border-white/40">
+          <ComplaintForm />
+        </section>
 
         
       </div>

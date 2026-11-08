@@ -105,7 +105,7 @@ const ContactForm = () => {
             Contact Us
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Have questions about HOA management? Need assistance with our services? We're here to help. Send us a message and we'll respond as soon as possible.
+            Have questions ? Need assistance with our services? We're here to help. Send us a message and we'll respond as soon as possible.
           </p>
         </motion.div>
 
@@ -139,7 +139,7 @@ const ContactForm = () => {
                   onChange={handleChange}
                   required
                   className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline focus:border-indigo-500 bg-surface text-text placeholder-textMuted"
-                  placeholder="JoOOhn Doe"
+                  placeholder="John Doe"
                 />
               </div>
 

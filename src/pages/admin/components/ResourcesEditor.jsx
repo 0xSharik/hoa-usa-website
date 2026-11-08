@@ -8,8 +8,9 @@ import {
   deleteResource,
   uploadDocument
 } from '../../../firebase/services';
+import { deleteImage } from '../../../utils/firebaseStorage';
 
-const ResourcesEditor = () => {
+const ResourcesEditor = ({ onRefresh }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +37,8 @@ const ResourcesEditor = () => {
     ...resources.videos
   ].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
+  console.log('All documents for display:', allDocuments);
+
   // Load data from Firebase on component mount
   useEffect(() => {
     loadResources();
@@ -45,8 +48,11 @@ const ResourcesEditor = () => {
     try {
       setLoading(true);
       setError(null);
+      console.log('Loading resources...');
       const resourcesData = await getResources();
+      console.log('Resources loaded:', resourcesData);
       setResources(resourcesData);
+      console.log('Resources state updated');
     } catch (error) {
       console.error('Error loading resources:', error);
       setError('Failed to load resources');
@@ -69,10 +75,31 @@ const ResourcesEditor = () => {
     if (window.confirm('Are you sure you want to delete this document?')) {
       try {
         setError(null);
-        // Determine the resource type based on the item
-        // Since we're saving everything as 'articles', we delete from articles
-        await deleteResource('articles', item.id);
+        console.log('Deleting document:', item);
+        
+        // Delete the file from Storage if it has a path
+        if (item.path) {
+          try {
+            console.log('Deleting file from storage:', item.path);
+            await deleteImage(item.path);
+            console.log('File deleted from storage');
+          } catch (storageError) {
+            console.warn('Failed to delete file from storage:', storageError);
+            // Continue with Firestore deletion even if storage deletion fails
+          }
+        }
+        
+        // Delete from Firestore documents collection
+        console.log('Deleting from Firestore:', item.id);
+        await deleteResource('documents', item.id);
+        console.log('Document deleted from Firestore');
+        
         await loadResources();
+        
+        // Refresh dashboard stats if callback provided
+        if (onRefresh) {
+          onRefresh();
+        }
       } catch (error) {
         console.error('Error deleting resource:', error);
         setError('Failed to delete resource');

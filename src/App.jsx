@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar/Navbar';
-import Footer from './components/Footer/Footer';
 import Hero from './components/Hero/Hero';
 import HomeContent from './components/Home/HomeContent';
 import Resources from './pages/Resources';
@@ -17,7 +16,6 @@ const Layout = ({ children }) => (
   <div className="min-h-screen flex flex-col">
     <Navbar />
     <main className="flex-grow">{children}</main>
-    <Footer />
   </div>
 );
 

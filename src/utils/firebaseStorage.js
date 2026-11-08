@@ -1,4 +1,4 @@
-import { ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, uploadBytesResumable, deleteObject } from 'firebase/storage';
 import { storage } from '../firebase/config';
 
 // Upload any file to Firebase Storage
@@ -152,12 +152,10 @@ export const deleteImage = async (path) => {
   
   try {
     const storageRef = ref(storage, path);
-    // Note: You'll need to import deleteObject from firebase/storage
-    // import { deleteObject } from 'firebase/storage';
-    // await deleteObject(storageRef);
-    console.log('Image deleted successfully:', path);
+    await deleteObject(storageRef);
+    console.log('File deleted successfully:', path);
   } catch (error) {
-    console.error('Error deleting image:', error);
+    console.error('Error deleting file:', error);
     throw error;
   }
 };

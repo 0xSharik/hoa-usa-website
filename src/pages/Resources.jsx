@@ -237,8 +237,7 @@ const Resources = () => {
   }
 
   const navItems = [
-    { id: 'all', label: 'All Documents', icon: LayoutGrid },
-    { id: 'documents', label: 'Documents', icon: FileText }
+    { id: 'all', label: 'All Documents', icon: LayoutGrid }
   ];
 
   return (

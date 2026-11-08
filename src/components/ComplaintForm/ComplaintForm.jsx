@@ -20,9 +20,6 @@ const initialFormData = {
   resolutionAttempted: '',
   resolutionDescription: '',
   desiredResolution: '',
-  signatureImage: null,
-  signatureImageUrl: '',
-  signatureDate: new Date().toISOString().split('T')[0]
 };
 
 const ComplaintForm = () => {
@@ -50,7 +47,7 @@ const ComplaintForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    
+
     if (type === 'checkbox') {
       if (checked) {
         setFormData(prev => ({
@@ -69,11 +66,6 @@ const ComplaintForm = () => {
           ...prev,
           evidenceFiles: files[0]
         }));
-      } else if (name === 'signatureImage') {
-        setFormData(prev => ({
-          ...prev,
-          signatureImage: files[0]
-        }));
       }
     } else {
       setFormData(prev => ({
@@ -89,13 +81,13 @@ const ComplaintForm = () => {
 
     try {
       const sanitizedFormData = { ...formData };
-      
+
       // Upload evidence files if any
       if (formData.evidenceFiles) {
         console.log('Uploading evidence file:', formData.evidenceFiles.name);
         try {
           const evidenceUrl = await uploadFile(formData.evidenceFiles, 'complaints/evidence');
-          console.log('Evidence file uploaded successfully:', evidenceUrl);
+          console.log('Evidence file uploaded successfully');
           sanitizedFormData.evidenceFileUrls = [evidenceUrl];
         } catch (uploadError) {
           console.error('Error uploading evidence file:', uploadError);
@@ -105,41 +97,32 @@ const ComplaintForm = () => {
         console.log('No evidence files to upload');
       }
       delete sanitizedFormData.evidenceFiles;
-      
-      // Upload signature image if any
-      if (formData.signatureImage) {
-        console.log('Uploading signature image:', formData.signatureImage.name);
-        try {
-          const signatureUrl = await uploadFile(formData.signatureImage, 'complaints/signatures');
-          console.log('Signature uploaded successfully:', signatureUrl);
-          sanitizedFormData.signatureImageUrl = signatureUrl;
-        } catch (uploadError) {
-          console.error('Error uploading signature image:', uploadError);
-          throw new Error('Failed to upload signature');
-        }
-      } else {
-        console.log('No signature image to upload');
-      }
-      delete sanitizedFormData.signatureImage;
-      
+
+
+
       // Submit complaint to Firebase
       const result = await submitComplaint(sanitizedFormData);
-      
+
       // Send email notification to admin
       try {
-        await sendComplaintNotificationToAdmin({ ...sanitizedFormData, id: result.id });
+        await sendComplaintNotificationToAdmin({
+          ...sanitizedFormData,
+          email: formData.email,  // ✅ FORCE EMAIL
+          id: result.id,
+          evidenceFileName: formData.evidenceFiles?.name
+        });
       } catch (emailError) {
         console.error('Error sending admin notification:', emailError);
         // Don't fail the submission if email fails
       }
-      
+
       setSubmitted(true);
-      
-      // Reset form after 3 seconds
+
+      // Reset form after 8 seconds
       setTimeout(() => {
         setSubmitted(false);
         setFormData(initialFormData);
-      }, 3000);
+      }, 12000);
     } catch (error) {
       console.error('Error submitting complaint:', error);
       setError('Failed to submit complaint. Please try again.');
@@ -150,8 +133,8 @@ const ComplaintForm = () => {
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: { duration: 0.6 }
     }
@@ -171,9 +154,9 @@ const ComplaintForm = () => {
             <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-8 h-8 text-indigo-600" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Complaint Submitted Successfully!</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">your request has been submitted</h3>
             <p className="text-gray-600 mb-6">
-              Thank you for bringing this matter to our attention. We have received your complaint and will review it promptly. You should receive a confirmation email shortly.
+              Thank you for bringing this matter to our attention. We have received your request and will review it promptly. You should receive a confirmation email shortly.
             </p>
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
               <AlertTriangle className="w-4 h-4" />
@@ -199,10 +182,10 @@ const ComplaintForm = () => {
             <AlertTriangle className="w-8 h-8 text-indigo-600" />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            File a Complaint
+            Concerns, Questions and suggestions
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Having issues with your HOA? We're here to help. Submit your complaint and we'll review it promptly to ensure your concerns are addressed.
+            Having issues ? We're here to help. Submit your complaint and we'll review it promptly to ensure your concerns are addressed.
           </p>
         </motion.div>
 
@@ -220,7 +203,7 @@ const ComplaintForm = () => {
               {error}
             </div>
           )}
-          
+
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Date Submitted */}
             <div className="bg-gray-50 p-4 rounded-lg">
@@ -242,11 +225,11 @@ const ComplaintForm = () => {
               <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
                 1. Homeowner Information
               </h3>
-              
+
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-700 text-sm font-medium mb-2">
-                    Name: 
+                    Name:
                   </label>
                   <input
                     type="text"
@@ -261,7 +244,7 @@ const ComplaintForm = () => {
 
                 <div>
                   <label className="block text-gray-700 text-sm font-medium mb-2">
-                    Phone Number: 
+                    Phone Number:
                   </label>
                   <input
                     type="tel"
@@ -277,7 +260,7 @@ const ComplaintForm = () => {
 
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Property Address: 
+                  Property Address:
                 </label>
                 <input
                   type="text"
@@ -292,7 +275,7 @@ const ComplaintForm = () => {
 
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Mailing Address (if different): 
+                  Mailing Address (if different):
                 </label>
                 <input
                   type="text"
@@ -306,7 +289,7 @@ const ComplaintForm = () => {
 
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Email Address: 
+                  Email Address:
                 </label>
                 <input
                   type="email"
@@ -323,12 +306,12 @@ const ComplaintForm = () => {
             {/* 2. Nature of Complaint */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
-                2. Nature of Complaint
+                2. Nature of Concern
               </h3>
-              
-              <div>
+
+              <div>Type of Concern
                 <label className="block text-gray-700 text-sm font-medium mb-3">
-                  Type of Complaint (check all that apply):
+                  (check all that apply):
                 </label>
                 <div className="space-y-2">
                   {complaintTypeOptions.map((type) => (
@@ -361,9 +344,9 @@ const ComplaintForm = () => {
             {/* 3. Description of Complaint */}
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
-                3. Description of Complaint
+                3. Description of Concern
               </h3>
-              
+
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-3">
                   Please describe the issue in detail. Include specific dates, times, locations, and any individual involved (if known).
@@ -375,7 +358,7 @@ const ComplaintForm = () => {
                   required
                   rows={8}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-surface text-text placeholder-textMuted"
-                  placeholder="Provide detailed description of the complaint..."
+                  placeholder="Provide detailed description of the concern..."
                 />
               </div>
             </div>
@@ -385,18 +368,28 @@ const ComplaintForm = () => {
               <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
                 4. Evidence or Documentation
               </h3>
-              
+
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-3">
                   (Attach photos, letters, or other supporting materials if available.)
                 </label>
-                <input
-                  type="file"
-                  name="evidenceFiles"
-                  onChange={handleChange}
-                  accept="image/*,.pdf,.doc,.docx"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-indigo-500 transition-colors bg-gray-50 hover:bg-indigo-50">
+                  <input
+                    type="file"
+                    name="evidenceFiles"
+                    onChange={handleChange}
+                    accept="image/*,.pdf,.doc,.docx"
+                    className="hidden"
+                    id="evidence-upload"
+                  />
+                  <label htmlFor="evidence-upload" className="cursor-pointer flex flex-col items-center">
+                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-600">
+                      {formData.evidenceFiles ? formData.evidenceFiles.name : 'Click to upload or drag and drop'}
+                    </span>
+                    <span className="text-xs text-gray-500 mt-1">PNG, JPG, PDF, DOC, DOCX up to 10MB</span>
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -405,7 +398,7 @@ const ComplaintForm = () => {
               <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
                 5. Have You Attempted to Resolve the Issue?
               </h3>
-              
+
               <div className="space-y-3">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -418,7 +411,7 @@ const ComplaintForm = () => {
                   />
                   <span className="text-gray-700"> Yes</span>
                 </label>
-                
+
                 {formData.resolutionAttempted === 'yes' && (
                   <div>
                     <label className="block text-gray-700 text-sm font-medium mb-2">
@@ -434,7 +427,7 @@ const ComplaintForm = () => {
                     />
                   </div>
                 )}
-                
+
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="radio"
@@ -454,10 +447,10 @@ const ComplaintForm = () => {
               <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
                 6. Desired Resolution
               </h3>
-              
+
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-3">
-                  What would you like the HOA to do regarding this issue?
+                  What would you like us to do regarding this issue?
                 </label>
                 <textarea
                   name="desiredResolution"
@@ -471,66 +464,7 @@ const ComplaintForm = () => {
               </div>
             </div>
 
-            {/* 7. Signature */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold text-gray-900 border-b-2 border-indigo-600 pb-2">
-                7. Signature
-              </h3>
-              
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <p className="text-gray-700 text-sm mb-4">
-                  I certify that the information provided is true and accurate to the best of my knowledge.
-                </p>
-                
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-gray-700 text-sm font-medium mb-2">
-                      Signature Image: 
-                    </label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-indigo-500 transition-colors">
-                      <input
-                        type="file"
-                        name="signatureImage"
-                        onChange={handleChange}
-                        accept="image/*"
-                        required
-                        className="hidden"
-                        id="signature-upload"
-                      />
-                      <label htmlFor="signature-upload" className="cursor-pointer flex flex-col items-center">
-                        <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                        <span className="text-sm text-gray-600">
-                          {formData.signatureImage ? formData.signatureImage.name : 'Click to upload signature image'}
-                        </span>
-                        <span className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 5MB</span>
-                      </label>
-                    </div>
-                    {formData.signatureImage && (
-                      <div className="mt-2">
-                        <img 
-                          src={URL.createObjectURL(formData.signatureImage)} 
-                          alt="Signature preview" 
-                          className="h-16 border border-gray-300 rounded"
-                        />
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label className="block text-gray-700 text-sm font-medium mb-2">
-                      Date: 
-                    </label>
-                    <input
-                      type="date"
-                      name="signatureDate"
-                      value={formData.signatureDate}
-                      onChange={handleChange}
-                      className="bg-transparent border-b-2 border-gray-300 focus:border-indigo-500 outline-none px-2 py-1"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+
 
             <div className="flex justify-center pt-6">
               <motion.button
@@ -548,7 +482,7 @@ const ComplaintForm = () => {
                 ) : (
                   <>
                     <AlertTriangle className="w-5 h-5" />
-                    Submit Complaint
+                    Submit Concern
                   </>
                 )}
               </motion.button>

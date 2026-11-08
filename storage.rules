@@ -3,6 +3,7 @@ service firebase.storage {
   match /b/{bucket}/o {
     
     // Helper functions
+    // Note: 'request.auth != null' includes anonymous users.
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -12,59 +13,59 @@ service firebase.storage {
              request.auth.token.admin == true;
     }
     
-    // Public images - anyone can read, admin can write
+    // Public images - anyone can read, authenticated users can write
     match /images/{allPaths=**} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
       allow delete: if isAdmin();
     }
     
-    // Vendor logos - public read, admin write
+    // Vendor logos - public read, authenticated users can write
     match /vendor-logos/{vendorId}/{fileName} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
       allow delete: if isAdmin();
     }
     
-    // Article thumbnails - public read, admin write
+    // Article thumbnails - public read, authenticated users can write
     match /article-thumbnails/{articleId}/{fileName} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
       allow delete: if isAdmin();
     }
     
-    // Video thumbnails - public read, admin write
+    // Video thumbnails - public read, authenticated users can write
     match /video-thumbnails/{videoId}/{fileName} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
       allow delete: if isAdmin();
     }
     
-    // Newsletter covers - public read, admin write
+    // Newsletter covers - public read, authenticated users can write
     match /newsletter-covers/{newsletterId}/{fileName} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
       allow delete: if isAdmin();
     }
     
-    // Complaint evidence files - public read, admin write
+    // Complaint evidence files - public read, authenticated users can write
     match /complaints/evidence/{allPaths=**} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
       allow delete: if isAdmin();
     }
     
-    // Complaint signature files - public read, admin write
+    // Complaint signature files - public read, authenticated users can write
     match /complaints/signatures/{allPaths=**} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
       allow delete: if isAdmin();
     }
     
@@ -82,11 +83,19 @@ service firebase.storage {
       allow delete: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Documents - public read, admin write
+    // Documents - public read, authenticated users can write
     match /documents/{allPaths=**} {
       allow read: if true;
-      allow write: if isAdmin();
-      allow create: if isAdmin();
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow delete: if isAdmin();
+    }
+    
+    // Announcements - public read, authenticated users can write
+    match /announcements/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+      allow create: if isAuthenticated();
       allow delete: if isAdmin();
     }
     

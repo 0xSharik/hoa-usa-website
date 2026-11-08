@@ -1,4 +1,5 @@
 import emailjs from '@emailjs/browser';
+import { toDate } from './dateUtils';
 
 // EmailJS configuration
 const EMAILJS_CONFIG = {
@@ -22,6 +23,7 @@ export const sendComplaintNotificationToAdmin = async (complaintData) => {
     const templateParams = {
       name: complaintData.name,
       email: complaintData.email,
+      user_email: complaintData.email,   // Add this for template display
       phone: complaintData.phone,
       property_address: complaintData.propertyAddress,
       complaint_types: complaintData.complaintTypes.join(', '),
@@ -30,7 +32,11 @@ export const sendComplaintNotificationToAdmin = async (complaintData) => {
       submission_date: new Date(complaintData.dateSubmitted).toLocaleDateString(),
       hoa_name: 'HOA Community',
       admin_email: EMAILJS_CONFIG.ADMIN_EMAIL,
-      to_email: EMAILJS_CONFIG.ADMIN_EMAIL
+      to_email: EMAILJS_CONFIG.ADMIN_EMAIL,
+      document: complaintData.evidenceFileUrls?.map((url, index) => ({
+        url: url,
+        name: complaintData.evidenceFileName || `Document ${index + 1}`
+      }))
     };
 
     const response = await emailjs.send(
@@ -109,6 +115,7 @@ export const sendContactNotificationToAdmin = async (contactData) => {
 // Send reply email to contact form submitter from admin
 export const sendContactReplyToUser = async (contactData, adminMessage) => {
   try {
+    const submittedAt = toDate(contactData.submissionDate || contactData.createdAt);
     const templateParams = {
       name: contactData.name,
       email: contactData.email,
@@ -116,7 +123,7 @@ export const sendContactReplyToUser = async (contactData, adminMessage) => {
       subject: contactData.subject,
       original_message: contactData.message,
       message: adminMessage,
-      submission_date: new Date(contactData.submissionDate).toLocaleDateString(),
+      submission_date: submittedAt ? submittedAt.toLocaleDateString() : 'N/A',
       hoa_name: 'HOA Community',
       to_email: contactData.email
     };

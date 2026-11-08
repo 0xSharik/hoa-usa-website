@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAllContacts, updateContactStatus, deleteContact } from '../../../firebase/services/formService';
 import { sendContactReplyToUser } from '../../../utils/emailService';
+import { formatDate, toDate } from '../../../utils/dateUtils';
 
 const ContactManagement = () => {
   const [contacts, setContacts] = useState([]);
@@ -111,16 +112,16 @@ const ContactManagement = () => {
         bValue = b.name.toLowerCase();
         break;
       case 'date':
-        aValue = a.submissionDate || a.createdAt ? new Date(a.submissionDate || a.createdAt) : new Date(0);
-        bValue = b.submissionDate || b.createdAt ? new Date(b.submissionDate || b.createdAt) : new Date(0);
+        aValue = toDate(a.submissionDate || a.createdAt)?.getTime() ?? 0;
+        bValue = toDate(b.submissionDate || b.createdAt)?.getTime() ?? 0;
         break;
       case 'status':
         aValue = a.status || 'pending';
         bValue = b.status || 'pending';
         break;
       default:
-        aValue = a.submissionDate || a.createdAt ? new Date(a.submissionDate || a.createdAt) : new Date(0);
-        bValue = b.submissionDate || b.createdAt ? new Date(b.submissionDate || b.createdAt) : new Date(0);
+        aValue = toDate(a.submissionDate || a.createdAt)?.getTime() ?? 0;
+        bValue = toDate(b.submissionDate || b.createdAt)?.getTime() ?? 0;
     }
     
     if (sortOrder === 'asc') {
@@ -138,12 +139,6 @@ const ContactManagement = () => {
       case 'replied': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
   };
 
   if (loading) {
